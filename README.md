@@ -2,8 +2,10 @@
 
 ## Analizador sintáctico y semántico para Cucaracha
 
-![cover](./resources/Enunciado.pdf)
 
 ## Para levantar la aplicación
 
     npm i && gulp
+
+##Enunciado
+![cover](resources/Enunciado.pdf)
