@@ -8,8 +8,4 @@
     npm i && gulp
 
 ##Enunciado
-[Enuunciado.pdf](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/arq1nnySu/cucaracha/master/resources/Enunciado.pdf)
-
-![Grafico][Enunciado]
-
-[Enunciado]: https://docs.google.com/viewer?url=https://raw.githubusercontent.com/arq1nnySu/cucaracha/master/resources/Enunciado.pdf
+[Enuunciado.pdf](resources/Enunciado.pdf)
