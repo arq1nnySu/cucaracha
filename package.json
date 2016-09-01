@@ -1,0 +1,22 @@
+{
+  "name": "cucaracha",
+  "version": "1.0.0",
+  "description": "Analizador sintáctico y semántico para Cucaracha",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ronny De Jesus <nnydjesus@gmail.com>, Susana Rosito <rosito.susana@gmail.com>",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "browser-sync": "^2.0.1",
+    "del": "^1.1.1",
+    "vinyl-paths": "^1.0.0",
+    "babelify": "^6.0.2",
+    "browserify": "^10.1.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "jison": "^0.4.17"
+  }
+}
