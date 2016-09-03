@@ -225,7 +225,7 @@ class StmtAssign extends ASTType{
 	}
 
 	toString(){
-		return this.name + "=" + this.expresion 
+		return this.constructor.name + "(" + this.id + "= " + this.expresion + ")" 
 	}
 }
 
@@ -236,7 +236,7 @@ class StmtVecAssign  extends BinaryExpr{
 	}
 
 	toString(){
-		return this.id + super.toString
+		return this.constructor.name + "(" + this.id + "[" + this.x + "]= " + this.y + ")" 
 	}
 }
 
@@ -248,7 +248,7 @@ class StmtIf extends ASTType{
 	}
 
 	toString(){
-		return this.constructor.name + "(" + this.x+")"
+		return this.constructor.name + "((" + this.expresion + ") { " + this.block + " })" 
 	}
 }
 
@@ -259,7 +259,7 @@ class StmtIfElse extends StmtIf{
 	}
 
 	toString(){
-		return this.constructor.name + "(" + this.x+")"
+		return this.constructor.name + "((" + this.expresion + ") { " + this.block + "} {" + this.elseBlock + "})"
 	}
 }
 
@@ -271,7 +271,7 @@ class StmtWhile extends ASTType{
 	}
 
 	toString(){
-		return this.constructor.name + "(" + this.x+")"
+		return this.constructor.name + "((" + this.expresion + ") {" + this.block + "})"
 	}
 }
 
@@ -286,7 +286,7 @@ class StmtCall extends ASTType{
 	}
 
 	toString(){
-		return this.constructor.name + "(" + this.x+")"
+		return this.constructor.name + "(" + this.id + "(" + this.expresions + "))"
 	}
 }
 
@@ -319,5 +319,6 @@ window.ExprNot = ExprNot
 window.ExprEq = ExprEq
 window.ExprAnd = ExprAnd
 window.ExprOr = ExprOr
+window.StmtVecAssign = StmtVecAssign
 
 export default { }

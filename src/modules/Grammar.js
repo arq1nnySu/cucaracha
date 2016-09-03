@@ -73,11 +73,11 @@ export default {
                  [ "VEC", "$$ = new VecType();" ]],
         
         "instruccion" : [["ID ASSIGN expresion", "$$ = new StmtAssign($1, $3);"],
-                         ["ID LBRACK expresion RBRACK ASSIGN expresion", "$$ = new StmtVecAssign($1, $3);"],
+                         ["ID LBRACK expresion RBRACK ASSIGN expresion", "$$ = new StmtVecAssign($1, $3, $6);"],
                          ["IF expresion bloque", "$$ = new StmtIf($2, $3);"],
-                         ["IF expresion bloque ELSE bloque", "$$ = new StmtIfElse($3, $4);"],
+                         ["IF expresion bloque ELSE bloque", "$$ = new StmtIfElse($2, $3, $5);"],
                          ["WHILE expresion bloque", "$$ = new StmtWhile($2, $3);"],
-                         ["RETURN expresion", "$$ = new StmtReturn($1, $2);"],
+                         ["RETURN expresion", "$$ = new StmtReturn($2);"],
                          ["ID LPAREN lista_expresiones RPAREN", "$$ = new StmtCall($1, $3);"]],
 
         "lista_instrucciones" : [[ "", "$$ = new Arrays();" ],
