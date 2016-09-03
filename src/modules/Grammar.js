@@ -71,55 +71,55 @@ export default {
                  [ "VEC", "$$ = new VecType();" ]],
 
 
-        "parametro": [[ "ID COLON tipo", "$$ = new Param($1, $3);" ]],
+        "parametro": [[ "ID COLON tipo", "$$ = new Parameter($1, $3);" ]],
 
-        "lista_no_vacia": [ [ "parametro", "$$ = new Params([$1])" ],
+        "lista_no_vacia": [ [ "parametro", "$$ = new Arrays($1)" ],
                             [ "parametro COMMA lista_no_vacia", "$$ = $3.add($1);" ]],
 
-        "lista_paramametros": [ [ "", "$$ = new Params([]);" ], 
+        "lista_paramametros": [ [ "", "$$ = new Arrays();" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
 
         "block": [ ["LBRACE RBRACE", "$$ = new Block([])"] ],
 
 
-        "lista_expresiones_no_vacia": [ [ "expresion", "$$ = new Params([$1])" ],
+        "lista_expresiones_no_vacia": [ [ "expresion", "$$ = new Arrays($1)" ],
                             [ "expresion COMMA lista_expresiones_no_vacia", "$$ = $3.add($1);" ]],
 
-        "lista_expresiones": [ [ "", "$$ = new Params([]);" ], 
+        "lista_expresiones": [ [ "", "$$ = new Arrays();" ], 
                                 [ "lista_expresiones_no_vacia", "$$ = $1;" ]],
 
         "expresion": [  ["expresion_logica", "$$ = $1"], ],
 
         "expresion_atomica": [  ["ID", "$$ = new ExprVar($1)"],
-                                ["NUM", "$$ = new Int(yytext)"],
-                                ["TRUE", "$$ = new Bool(true)"],
-                                ["False", "$$ = new Bool(false)"],
+                                ["NUM", "$$ = new ExprConstNum(yytext)"],
+                                ["TRUE", "$$ = new ExprConstBool(true)"],
+                                ["FALSE", "$$ = new ExprConstBool(false)"],
                                 ["LBRACK lista_expresiones RBRACK", "$$ = new ExprVecLength($2)"],
                                 ["HASH ID", "$$ = new ExprVecLength($2)"],
                                 ["ID LBRACK expresion RBRACK", "$$ = new ExprVecDeref($1, $3)"],
                                 ["ID LPAREN lista_expresiones RPAREN", "$$ = new ExprVecDeref($1, $3)"],
                                 ["LPAREN expresion RPAREN", "$$ = $2"] ],
 
-        "expresion_multiplicativa": [ ["expresion_multiplicativa TIMES expresion_atomica", "$$ = new Mult($1,$3)"],
+        "expresion_multiplicativa": [ ["expresion_multiplicativa TIMES expresion_atomica", "$$ = new ExprMul($1,$3)"],
                                       ["expresion_atomica", "$$ = $1"] ],
 
-        "expresion_aditiva": [ ["expresion_aditiva PLUS expresion_multiplicativa", "$$ = new Plus($1,$3)"],
-                               ["expresion_aditiva MINUS expresion_multiplicativa", "$$ = new Minus($1,$3)"],
+        "expresion_aditiva": [ ["expresion_aditiva PLUS expresion_multiplicativa", "$$ = new ExprAdd($1,$3)"],
+                               ["expresion_aditiva MINUS expresion_multiplicativa", "$$ = new ExprSub($1,$3)"],
                                ["expresion_multiplicativa", "$$ = $1"] ],
 
-        "expresion_relacional": [   ["expresion_aditiva LE expresion_aditiva", "$$ = new Plus($1,$3)"],
-                                    ["expresion_aditiva GE expresion_aditiva", "$$ = new Minus($1,$3)"],
-                                    ["expresion_aditiva LT expresion_aditiva", "$$ = new Minus($1,$3)"],
-                                    ["expresion_aditiva GT expresion_aditiva", "$$ = new Minus($1,$3)"],
-                                    ["expresion_aditiva EQ expresion_aditiva", "$$ = new Minus($1,$3)"],
-                                    ["expresion_aditiva NE expresion_aditiva", "$$ = new Minus($1,$3)"],
+        "expresion_relacional": [   ["expresion_aditiva LE expresion_aditiva", "$$ = new ExprLe($1,$3)"],
+                                    ["expresion_aditiva GE expresion_aditiva", "$$ = new ExprGe($1,$3)"],
+                                    ["expresion_aditiva LT expresion_aditiva", "$$ = new ExprLt($1,$3)"],
+                                    ["expresion_aditiva GT expresion_aditiva", "$$ = new ExprGt($1,$3)"],
+                                    ["expresion_aditiva EQ expresion_aditiva", "$$ = new ExprEq($1,$3)"],
+                                    ["expresion_aditiva NE expresion_aditiva", "$$ = new ExprNe($1,$3)"],
                                     ["expresion_aditiva", "$$ = $1"] ],
 
-        "expresion_logica_atomica": [ ["NOT expresion_logica_atomica", "$$ = $2"],
+        "expresion_logica_atomica": [ ["NOT expresion_logica_atomica", "$$ = new ExprNot($2)"],
                                       ["expresion_relacional", "$$ = $1"] ],
 
-        "expresion_logica": [ ["expresion_logica AND expresion_logica_atomica", "$$ = $2"],
-                                ["expresion_logica OR expresion_logica_atomica", "$$ = $2"],
+        "expresion_logica": [ ["expresion_logica AND expresion_logica_atomica", "$$ = new ExprAnd($1, $3)"],
+                                ["expresion_logica OR expresion_logica_atomica", "$$ = new ExprOR($1, $3)"],
                                 ["expresion_logica_atomica ", "$$ = $1"], ],
 
     }
