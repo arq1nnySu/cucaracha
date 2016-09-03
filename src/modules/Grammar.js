@@ -58,11 +58,11 @@ export default {
     "bnf": {
 
         "expressions": [
-            ["lista_instrucciones EOF", "return $1"]
+            ["bloque EOF", "return $1"]
         ],
 
-        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN block", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
-                     [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo block", "$$ = new Fun($2, $7, $4, $8);" ]],
+        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
+                     [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo bloque", "$$ = new Fun($2, $7, $4, $8);" ]],
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
@@ -70,9 +70,9 @@ export default {
         
         "instruccion" : [["ID ASSIGN expresion", "$$ = new StmtAssign($1, $3);"],
                          ["ID LBRACK expresion RBRACK ASSIGN expresion", "$$ = new StmtVecAssign($1, $3);"],
-                         ["IF expresion block", "$$ = new StmtIf($2, $3);"],
-                         ["IF expresion block ELSE block", "$$ = new StmtIfElse($3, $4);"],
-                         ["WHILE expresion block", "$$ = new StmtWhile($2, $3);"],
+                         ["IF expresion bloque", "$$ = new StmtIf($2, $3);"],
+                         ["IF expresion bloque ELSE bloque", "$$ = new StmtIfElse($3, $4);"],
+                         ["WHILE expresion bloque", "$$ = new StmtWhile($2, $3);"],
                          ["RETURN expresion", "$$ = new StmtReturn($1, $2);"],
                          ["ID LPAREN lista_expresiones RPAREN", "$$ = new StmtCall($1, $3);"]],
 
@@ -87,7 +87,7 @@ export default {
         "lista_paramametros": [ [ "", "$$ = new Arrays();" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
 
-        "block": [ ["LBRACE RBRACE", "$$ = new Block([])"] ],
+        "bloque": [ ["LBRACE lista_instrucciones RBRACE", "$$ = new Block($2)"] ],
 
 
         "lista_expresiones_no_vacia": [ [ "expresion", "$$ = new Arrays($1)" ],
