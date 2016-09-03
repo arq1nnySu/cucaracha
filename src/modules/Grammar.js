@@ -3,9 +3,7 @@ export default {
 
     "lex": {
         "rules": [
-            ["\\s+", "/* skip whitespace */"],
-            
-            
+            ["\\s+", "/* skip whitespace */"],            
             ["\\^", "return '^'"],
             ["!", "return '!'"],
             ["%", "return '%'"],
@@ -14,7 +12,6 @@ export default {
             ["$", "return 'EOF'"],
             //
             ["[0-9]+", "return 'NUMBER'"],
-            ["[ a-zA-Z][ a-zA-Z0-9]*", "return 'ID'"],
             // [":=", "return ':='"],
             ["\\*", "return '*'"],
             ["\\/", "return '/'"],
@@ -23,8 +20,13 @@ export default {
             ["!", "return '!'"],
             ["\\(", "return '('"],
             ["\\)", "return ')'"],
+            ["\\{", "return '{'"],
+            ["\\}", "return '}'"],
+            ["\\,", "return 'COMMA'"],
             ["True|False", "return 'BOOL'"],
-            ["function ID", "return 'FUNC'"],
+            ["function", "return 'FUNC'"],
+            ["[a-zA-Z][ a-zA-Z0-9]*", "return 'ID'"],
+            ["^$", "return 'ε'"],
         ]
     },
 
@@ -37,10 +39,26 @@ export default {
         ["left", "UMINUS"]
     ],
 
+    // "start": "ALL",
+
     "bnf": {
+
         "expressions": [
-            ["e EOF", "return $1"]
+            ["e EOF", "return $1"],
+            ["function EOF", "return $1"],
+            ["lista_paramametros EOF", "return $1"],
         ],
+
+        "function": [[ "FUNC ID lista_paramametros", "$$ = new Func($2, '', $3, {});" ]],
+
+        "parametro": [[ "ID", "$$ = new Param(yytext);" ]],
+
+        "lista_no_vacia": [ [ "parametro", "$$ = new Params([$1])" ],
+                            [ "parametro COMMA lista_no_vacia", "console.log($3); $$ = $3;" ]],
+
+        "lista_paramametros": [ [ "ε", "$$ = new Params([]);" ], 
+                                [ "lista_no_vacia", "$$ = $1;" ]],
+
 
         "e": [
             
@@ -51,6 +69,7 @@ export default {
             ["E", "$$ = Math.E"],
             ["PI", "$$ = Math.PI"],
             //
+            //["e + e", "$$ = new Suma($1, $3)"],
             ["e + e", "$$ = new Suma($1, $3)"],
             ["e - e", "$$ = new Resta($1, $3)"],
             ["e * e", "$$ = new Mult($1,$3)"],

@@ -5,13 +5,41 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script> -->
     <style type="text/css">
-    	.tab { margin-left: 40px; }
+    .tab {
+        margin-left: 40px;
+    }
+
+    body {
+        overflow: hidden;
+    }
+    
+    #input {
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%!important;
+    }
+
     </style>
 </head>
 
 <body>
-    <textarea id="input"></textarea>
-    <input type="button" id="parser" value="Parsear">
-    <p id="result"></p>
+    <pre id="input">3+2</pre>
+    <div style="top: 53%; position:absolute;">
+        <input type="button" id="parser" value="Parsear" >
+        <p id="result"></p>    
+    </div>
+    
+
+    <script src="http://ajaxorg.github.io/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
     <script src="output.js"></script>
+    <script>
+        var editor = ace.edit("input");
+        editor.setTheme("ace/theme/twilight");
+        editor.session.setMode("ace/mode/javascript");
+        window.editor = editor
+    </script>
 </body>

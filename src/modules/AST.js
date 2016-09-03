@@ -61,7 +61,7 @@ class Func{
 	}
 
 	toString(){
-		return this.name + "(" + this.parameters.join(', ')+") :" 
+		return this.name + "(" + this.parameters +") :" 
 			+ this.type +"" + this.block
 	}
 }
@@ -73,6 +73,35 @@ class Block{
 
 	toString(){
 		return this.statements.join(', ')
+	}
+}
+
+class Params{
+	constructor(statements){
+		this.statements = statements;
+	}
+
+	toString(){
+		return "Params("+this.statements.join(", ")+")"
+	}
+
+	add(param){
+		this.statements.unshift(param)
+		return this.statements
+	}
+
+	eval(){
+		return ""
+	}
+}
+
+class Param{
+	constructor(name){
+		this.name = name;
+	}
+
+	toString(){
+		return this.name
 	}
 }
 
@@ -132,5 +161,7 @@ window.Bool = Bool
 window.Bool = Id
 window.Func = Func
 window.Assign = Assign
+window.Params = Params
+window.Param = Param
 
 export default { Int, Arithmetic, Sum, Resta, Mult, Div, Bool, Id, Func, Assign}

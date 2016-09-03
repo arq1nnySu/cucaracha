@@ -7,5 +7,10 @@ import Jison from 'jison';
 var parser = new Jison.Parser(grammar);
 
 $("#parser").click(function(){
-	$("#result").html(parser.parse($("#input").val()).toString())
+	try{
+		var exp = parser.parse(window.editor.getValue())
+		$("#result").html(exp.toString() + " = " + exp.eval())
+	}catch(err){
+		$("#result").html(err.message)
+	}
 })
