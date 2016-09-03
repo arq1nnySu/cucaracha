@@ -33,13 +33,14 @@ class ExprConstBool{
 	}
 }
 
-class Program{
-	constructor(functions){
-		this.functions = functions;
+class Program extends Array{
+	constructor(){
+		super()
 	}
 
-	toString(){
-		return this.functions.join(', ')
+	add(param){
+		this.unshift(param)
+		return this
 	}
 }
 
@@ -70,7 +71,7 @@ class Block{
 class Arrays extends Array{
 	constructor(value){
 		super()
-		this.add(value)
+		if(value) this.add(value)
 	}
 
 	add(param){
@@ -310,6 +311,13 @@ window.ExprVar = ExprVar
 window.VoidType = VoidType
 window.Instructions = Instructions
 window.StmtAssign = StmtAssign
-
+window.Program = Program
+window.StmtIf = StmtIf
+window.StmtCall = StmtCall
+window.ExprLt = ExprLt
+window.ExprNot = ExprNot
+window.ExprEq = ExprEq
+window.ExprAnd = ExprAnd
+window.ExprOr = ExprOr
 
 export default { }

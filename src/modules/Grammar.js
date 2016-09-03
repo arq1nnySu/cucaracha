@@ -58,11 +58,15 @@ export default {
     "bnf": {
 
         "expressions": [
-            ["bloque EOF", "return $1"]
+            ["programa EOF", "return $1"]
         ],
+
+        "programa": [ [ "", "$$ = new Program();" ], 
+                                [ "function programa", "$$ = $2.add($1);" ]],
 
         "function": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
                      [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo bloque", "$$ = new Fun($2, $7, $4, $8);" ]],
+
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
