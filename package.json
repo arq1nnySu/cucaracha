@@ -14,7 +14,8 @@
     "vinyl-paths": "^1.0.0",
     "babelify": "^6.0.2",
     "browserify": "^10.1.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "merge-stream": "^1.0.0"
   },
   "dependencies": {
     "jison": "^0.4.17"

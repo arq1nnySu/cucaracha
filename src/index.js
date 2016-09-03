@@ -4,7 +4,7 @@ import Jison from 'jison';
 
 
 // console.log(grammar.grammar)
-var parser = new Jison.Parser(grammar);
+window.parser = new Jison.Parser(grammar);
 
 $("#parser").click(function(){
 	try{

@@ -320,5 +320,6 @@ window.ExprEq = ExprEq
 window.ExprAnd = ExprAnd
 window.ExprOr = ExprOr
 window.StmtVecAssign = StmtVecAssign
+window.StmtReturn = StmtReturn
 
 export default { }

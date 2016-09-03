@@ -2,18 +2,16 @@
 
 <head>
     <title>ES6 to ES5</title>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script> -->
     <style type="text/css">
     .tab {
         margin-left: 40px;
     }
-
+    
     body {
         overflow: hidden;
     }
     
-    #input {
+    #ace {
         margin: 0;
         position: absolute;
         top: 0;
@@ -21,33 +19,19 @@
         right: 0;
         height: 50%!important;
     }
-
     </style>
+    <script src="bower_components/ace-builds/src-noconflict/ace.js" type="text/javascript"></script>
+    <link rel="import" href="bower_components/polymer/polymer.html">
+    <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <link rel="import" href="components/editor.html">
 </head>
 
 <body>
-    <pre id="input">
-    fun main() { 
-        if (not 5 < 2 + 3 * 2 and 2 * (3 + 3) == 12) {
-            x := 1 
-        }
-        putChar(x) 
-        
-    }
-    </pre>
-    <div style="top: 53%; position:absolute;">
-        <input type="button" id="parser" value="Parsear" >
-        <p id="result"></p>    
+    <div>  
+        <cucaracha-editor id="dfdf"></cucaracha-editor>
     </div>
     
-
-    <script src="http://ajaxorg.github.io/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-
     <script src="output.js"></script>
-    <script>
-        var editor = ace.edit("input");
-        editor.setTheme("ace/theme/twilight");
-        editor.session.setMode("ace/mode/javascript");
-        window.editor = editor
-    </script>
 </body>
+
+</html>
