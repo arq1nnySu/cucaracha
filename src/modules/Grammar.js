@@ -42,6 +42,7 @@ export default {
     ],
 
     // "start": "ALL",
+    "tokens": "( ) { } [ ] :",
 
     "bnf": {
 
@@ -52,7 +53,7 @@ export default {
             ["block EOF", "return $1"],  
         ],
 
-        "function": [[ "FUNC ID lista_paramametros", "$$ = new Func($2, '', $3, {});" ]],
+        "function": [[ "FUNC ID ( lista_paramametros ) block", "$$ = new Func($2, '', $4, $6);" ]],
 
         "parametro": [[ "ID", "$$ = new Param(yytext);" ]],
 
@@ -61,7 +62,6 @@ export default {
 
         "lista_paramametros": [ [ "ε", "$$ = new Params([]);" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
-
 
         "block": [ ["{ }", "$$ = new Block([])"] ],
         
