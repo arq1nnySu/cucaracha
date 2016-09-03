@@ -3,7 +3,8 @@ export default {
 
     "lex": {
         "rules": [
-            ["\\s+", "/* skip whitespace */"],            
+            ["\\s+", "/* skip whitespace */"],
+            ["\\--*$", "COMMENT"],
             ["$", "return 'EOF'"],
             ["[0-9]+", "return 'NUM'"],
 

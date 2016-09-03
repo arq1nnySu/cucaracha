@@ -1,0 +1,74 @@
+Polymer({
+      is: "cucaracha-editor",
+      listeners: {
+        "ace.editor-ready": "onAceReady",
+        "ace.editor-content": "onContentChange",
+      },
+      properties: {
+        code: String,
+      },
+      ready: function() {
+        this.editor = this.$.ace.editor;
+        this._setFatalities();
+        this._subscribeToChangeEvents();
+      },
+
+      onAceReady: function() {
+        this.$.ace.editor.$blockScrolling = Infinity;
+      },
+
+      onContentChange: function(content) {
+        this.code = content.detail.value;
+        this.editor.getSession().clearAnnotations();
+      },
+
+      runCode: function() {
+        this.editor.getSession().clearAnnotations();
+        const sourceCode = this.editor.getValue();
+        var ast = this.parse(sourceCode)
+        
+        if (ast.error) {
+          $("#result").html(err.message)
+          return
+        }
+
+        $("#result").html(ast.toString())
+      },
+
+      parse: function(sourceCode) {
+        try {
+          return parser.parse(sourceCode)
+        } catch (err) {
+          this.reportError(err.hash)
+          return e;
+        }
+      },
+      
+      interpret: function(ast, initialState) {
+      },
+
+      reportError: function(err, type = "error") {
+        this.editor.getSession().setAnnotations([{
+          row: err.line,
+          column: err.loc.first_column,
+          text: "Error en la linea "+ err.line + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
+          type: type
+        }]);
+      },
+
+      _subscribeToChangeEvents: function() {
+        this.editor.getSession().on("change", () => {
+          this.editor.getSession().setAnnotations([]);
+        });
+      },
+
+      _setFatalities: function() {
+        const ace = this.$.ace;
+        ace.editor.commands.addCommand({
+          name: "run-code",
+          bindKey: { win: "ctrl+enter", mac: "command+enter" },
+          exec: () => { this.runCode() }
+        });
+      }
+
+    });

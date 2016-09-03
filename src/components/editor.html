@@ -15,6 +15,7 @@
     </style>
     <ace-widget
         id="ace"
+        mode="ace/mode/cucaracha"
         theme="ace/theme/chrome"
         font-size="18"
         tab-size="4"
@@ -27,114 +28,15 @@ fun main() {
     x := 1
   } 
   putChar(x)
+  return x
 }
 
     </ace-widget>
     <div style="top: 53%; position:absolute;">
-        <input type="button"  value="Parsear" on-click="onRunCode"></input>
+        <input type="button"  value="Parsear" on-click="runCode"></input>
         <p id="result"></p>    
     </div>
     
   </template>
-
-  <script >
-    Polymer({
-      is: "cucaracha-editor",
-      listeners: {
-        "ace.editor-ready": "onAceReady",
-        "ace.editor-content": "onContentChange",
-      },
-      properties: {
-        codeWasLoaded: { type: Boolean, value: false },
-        code: String,
-      },
-      ready: function() {
-        this.editor = this.$.ace.editor;
-        var CucarachaMode = ace.require("ace/mode/cucaracha").Mode;
-        this.editor.session.setMode(new CucarachaMode());
-        this._setFatalities();
-        this._subscribeToChangeEvents();
-      },
-
-      onAceReady: function() {
-        this.$.ace.editor.$blockScrolling = Infinity;
-      },
-
-      onContentChange: function(content) {
-        this.code = content.detail.value;
-        this.editor.getSession().clearAnnotations();
-      },
-
-      onRunCode: function() {
-        this.editor.getSession().clearAnnotations();
-        try{
-          const sourceCode = this.editor.getValue();
-          var exp = parser.parse(sourceCode)
-          $("#result").html(exp.toString())
-        }catch(err){
-          this._reportError(err.hash)
-          $("#result").html(err.message)
-        }
-
-      },
-
-      _runCode: function(initialState) {
-        this.editor.getSession().clearAnnotations();
-        const sourceCode = this.editor.getValue();
-        // const ast = this._parse(sourceCode);
-        // if (ast.error) return;
-        // const context = this._interpret(ast, initialState);
-        // if (context.error || context.on) return;
-        // this.fire("execution-result", { context: context });
-      },
-      _parse: function(sourceCode) {
-        try {
-          return this.parser.parse(sourceCode);
-        } catch (e) {
-          // Parser errors
-          this._reportError(e, e.error);
-          // var AceRange = ace.require('ace/range').Range;
-          // this.editor.getSession().addMarker(new AceRange(e.on.range.start.row, e.on.range.start.column, e.on.range.end.row, e.on.range.end.column), "error-line", "fullLine", true)
-          this.fire("compilation-error", e.error);
-          return e;
-        }
-      },
-      _interpret: function(ast, initialState) {
-        // try {
-        //   return this.parser.interpret(ast, initialState);
-        // } catch (e) {
-        //   // Runtime errors
-        //   if (e.error) this._reportError(e, e.error, "info");
-        //   // Business errors
-        //   if (e.on) this._reportError(e, e.message, "info");
-        //   this.fire("execution-error", e.message);
-        //   return e;
-        // }
-      },
-      _reportError: function(err, type = "error") {
-        this.editor.getSession().setAnnotations([{
-          row: err.line,
-          column: err.loc.first_column,
-          text: "Error en la linea "+ err.line + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
-          type: type
-        }]);
-      },
-
-      _subscribeToChangeEvents: function() {
-        this.editor.getSession().on("change", () => {
-          this.editor.getSession().setAnnotations([]);
-        });
-      },
-
-      _setFatalities: function() {
-        const ace = this.$.ace;
-        ace.editor.commands.addCommand({
-          name: "run-code",
-          bindKey: { win: "ctrl+enter", mac: "command+enter" },
-          exec: () => { this.onRunCode() }
-        });
-      }
-
-    });
-  </script>
+  <script src="./editor.js" type="text/javascript"></script>
 </dom-module>
