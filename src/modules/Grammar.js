@@ -18,7 +18,7 @@ export default {
             ["\\:", "return 'COLON'"],
             ["\\#", "return 'HASH'"],
             ["\\<=", "return 'LE'"], 
-            ["\\>=", "return 'LE'"], 
+            ["\\>=", "return 'GE'"], 
             ["\\<", "return 'LT'"], 
             ["\\>", "return 'GT'"], 
             ["\\==", "return 'EQ'"], 
@@ -48,12 +48,14 @@ export default {
     },
 
     "operators": [
+        ["left", "TIMES", "DIV"], // mayor
         ["left", "PLUS", "MINUS"],
-        ["left", "TIMES", "DIV"],
-        ["left", "AND", "OR"]
+        ["nonassoc", "LE", "GE", "LT", "GT", "EQ", "NE"],
+        ["left", "NOT"],
+        ["left", "AND", "OR"]  // menor
     ],
 
-    //"tokens": "( ) { } [ ] :",
+    "tokens": "BOOL, INT, VEC, TRUE, FALSE, AND, ELSE, FUN, IF, NOT, OR, RETURN, WHILE",
 
     "bnf": {
 
