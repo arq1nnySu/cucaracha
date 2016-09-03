@@ -1,12 +1,13 @@
 class ASTType{
 	toString(){
-		return this.constructor.name 
+		return this.constructor.name + " "   
 	}
 }
 
 class IntType extends ASTType {}
 class BoolType extends ASTType {}
 class VecType extends ASTType {}
+class VoidType extends ASTType {}
 
 class Int{
 	constructor(value){
@@ -204,5 +205,6 @@ window.VecType = VecType
 window.ExprVecLength = ExprVecLength
 window.ExprVecDeref = ExprVecDeref
 window.ExprVar = ExprVar
+window.VoidType = VoidType
 
 export default { }
