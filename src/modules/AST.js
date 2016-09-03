@@ -1,3 +1,13 @@
+class ASTType{
+	toString(){
+		return this.constructor.name 
+	}
+}
+
+class IntType extends ASTType {}
+class BoolType extends ASTType {}
+class VecType extends ASTType {}
+
 class Int{
 	constructor(value){
 		this.value = Number(value);
@@ -87,7 +97,7 @@ class Params{
 
 	add(param){
 		this.statements.unshift(param)
-		return this.statements
+		return this
 	}
 
 	eval(){
@@ -96,12 +106,13 @@ class Params{
 }
 
 class Param{
-	constructor(name){
+	constructor(name, type){
 		this.name = name;
+		this.type = type
 	}
 
 	toString(){
-		return this.name
+		return this.name+":"+this.type
 	}
 }
 
@@ -164,5 +175,8 @@ window.Assign = Assign
 window.Params = Params
 window.Param = Param
 window.Block = Block
+window.IntType = IntType
+window.BoolType = BoolType
+window.VecType = VecType
 
-export default { Int, Arithmetic, Sum, Resta, Mult, Div, Bool, Id, Func, Assign}
+export default { }
