@@ -18,6 +18,8 @@ export default {
             ["-", "return '-'"],
             ["\\+", "return '+'"],
             ["!", "return '!'"],
+            ["\\{", "return '{'"],
+            ["\\}", "return '}'"],
             ["\\(", "return '('"],
             ["\\)", "return ')'"],
             ["\\{", "return '{'"],
@@ -47,6 +49,7 @@ export default {
             ["e EOF", "return $1"],
             ["function EOF", "return $1"],
             ["lista_paramametros EOF", "return $1"],
+            ["block EOF", "return $1"],  
         ],
 
         "function": [[ "FUNC ID lista_paramametros", "$$ = new Func($2, '', $3, {});" ]],
@@ -60,6 +63,8 @@ export default {
                                 [ "lista_no_vacia", "$$ = $1;" ]],
 
 
+        "block": [ ["{ }", "$$ = new Block([])"] ],
+        
         "e": [
             
             ["e ^ e", "$$ = Math.pow($1, $3)"],

@@ -9,7 +9,7 @@ var parser = new Jison.Parser(grammar);
 $("#parser").click(function(){
 	try{
 		var exp = parser.parse(window.editor.getValue())
-		$("#result").html(exp.toString() + " = " + exp.eval())
+		$("#result").html(exp.toString())
 	}catch(err){
 		$("#result").html(err.message)
 	}
