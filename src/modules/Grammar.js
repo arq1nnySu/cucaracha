@@ -25,7 +25,12 @@ export default {
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
             ["\\,", "return 'COMMA'"],
-            ["True|False", "return 'BOOL'"],
+            ["\\:", "return 'COLON'"],
+            ["True", "return 'TRUE'"],
+            ["False", "return 'FALSE'"],
+            ["Bool", "return 'BOOL'"],
+            ["Int", "return 'INT'"],
+            ["Vec", "return 'VEC'"],
             ["function", "return 'FUNC'"],
             ["[a-zA-Z][ a-zA-Z0-9]*", "return 'ID'"],
             ["^$", "return 'ε'"],
@@ -54,10 +59,15 @@ export default {
 
         "function": [[ "FUNC ID lista_paramametros", "$$ = new Func($2, '', $3, {});" ]],
 
-        "parametro": [[ "ID", "$$ = new Param(yytext);" ]],
+        "tipo": [[ "INT", "$$ = new IntType();" ],
+                 [ "BOOL", "$$ = new BoolType();" ],
+                 [ "VEC", "$$ = new VecType();" ]],
+
+
+        "parametro": [[ "ID COLON tipo", "$$ = new Param($1, $3);" ]],
 
         "lista_no_vacia": [ [ "parametro", "$$ = new Params([$1])" ],
-                            [ "parametro COMMA lista_no_vacia", "console.log($3); $$ = $3;" ]],
+                            [ "parametro COMMA lista_no_vacia", "$$ = $3.add($1);" ]],
 
         "lista_paramametros": [ [ "ε", "$$ = new Params([]);" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
