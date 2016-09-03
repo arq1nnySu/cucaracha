@@ -32,23 +32,13 @@ class Id{
 	}	
 }
 
-class Type{
-	constructor(name){
-		this.name = name;
-	}
-
-	equals(aType){
-		return this.name == aType.name
+class Bool{
+	constructor(value){
+		this.value = value
 	}
 
 	toString(){
-		return this.name
-	}
-}
-
-class Bool extends Type {
-	constructor(name){
-		super(name);
+		return this.value
 	}
 }
 
@@ -134,13 +124,13 @@ class Arithmetic{
 	}
 }
 
-class Sum extends Arithmetic{
+class Plus extends Arithmetic{
 	constructor(x, y){
 		super(x, y, "+")
 	}
 }
 
-class Resta extends Arithmetic{
+class Minus extends Arithmetic{
 	constructor(x, y){
 		super(x, y, "-")
 	}
@@ -163,13 +153,46 @@ class Assign extends Arithmetic{
 	}
 }
 
+class ExprVecLength extends ASTType{
+	constructor(id){
+		super()
+		this.id = id
+	}
+	
+	toString(){
+		return this.id+".length"
+	}
+
+}
+class ExprVar extends ASTType{
+	constructor(id){
+		super()
+		this.id = id
+	}
+	
+	toString(){
+		return this.id
+	}
+}
+class ExprVecDeref extends ASTType{
+	constructor(id, expresion){
+		super()
+		this.id = id
+		this.expresion = expresion
+	}
+	
+	toString(){
+		return this.id+"["+this.expresion+"]"
+	}
+}
+
 window.Int = Int
-window.Suma = Sum
-window.Resta = Resta
+window.Plus = Plus
+window.Minus = Minus
 window.Mult = Mult
 window.Div = Div
 window.Bool = Bool
-window.Bool = Id
+window.Id = Id
 window.Fun = Fun
 window.Assign = Assign
 window.Params = Params
@@ -178,5 +201,8 @@ window.Block = Block
 window.IntType = IntType
 window.BoolType = BoolType
 window.VecType = VecType
+window.ExprVecLength = ExprVecLength
+window.ExprVecDeref = ExprVecDeref
+window.ExprVar = ExprVar
 
 export default { }

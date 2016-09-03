@@ -5,7 +5,7 @@ export default {
         "rules": [
             ["\\s+", "/* skip whitespace */"],            
             ["$", "return 'EOF'"],
-            ["[0-9]+", "return 'NUMBER'"],
+            ["[0-9]+", "return 'NUM'"],
 
             ["\\(", "return 'LPAREN'"],
             ["\\)", "return 'RPAREN'"],
@@ -53,16 +53,14 @@ export default {
         ["left", "AND", "OR"]
     ],
 
-    // "start": "ALL",
     "tokens": "( ) { } [ ] :",
 
     "bnf": {
 
         "expressions": [
-            ["e EOF", "return $1"],
-            ["function EOF", "return $1"],
-            ["lista_paramametros EOF", "return $1"],
-            ["block EOF", "return $1"],  
+            ["function ", "return $1"],
+            ["block", "return $1"],  
+            ["lista_expresiones EOF", "return $1"]
         ],
 
         "function": [[ "FUN ID ( lista_paramametros ) block", "$$ = new Fun($2, '', $4, $6);" ]],
@@ -77,22 +75,51 @@ export default {
         "lista_no_vacia": [ [ "parametro", "$$ = new Params([$1])" ],
                             [ "parametro COMMA lista_no_vacia", "$$ = $3.add($1);" ]],
 
-        "lista_paramametros": [ [ "ε", "$$ = new Params([]);" ], 
+        "lista_paramametros": [ [ "", "$$ = new Params([]);" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
 
         "block": [ ["LBRACE RBRACE", "$$ = new Block([])"] ],
-        
-        "e": [
-            ["e PLUS e", "$$ = new Suma($1, $3)"],
-            ["e MINUS e", "$$ = new Resta($1, $3)"],
-            ["e TIMES e", "$$ = new Mult($1,$3)"],
-            ["e DIV e", "$$ = new Div($1,$3)"],
-            ["LPAREN e RPAREN", "$$ = $2"],
-            // ["ID := e", "$$ = new Assign($1, $3)"],
-            ["NUMBER", "$$ = new Int(yytext)"],
-            ["BOOL", "$$ = new Bool(yytext)"],
-            // ["ID", "$$ = yytext"],
-            ["FUNC ", "$$ = new Func('dsd', 'type', [], '')"],
-        ]
+
+
+        "lista_expresiones_no_vacia": [ [ "expresion", "$$ = new Params([$1])" ],
+                            [ "expresion COMMA lista_expresiones_no_vacia", "$$ = $3.add($1);" ]],
+
+        "lista_expresiones": [ [ "", "$$ = new Params([]);" ], 
+                                [ "lista_expresiones_no_vacia", "$$ = $1;" ]],
+
+        "expresion": [  ["expresion_logica", "$$ = $1"], ],
+
+        "expresion_atomica": [  ["ID", "$$ = new ExprVar($1)"],
+                                ["NUM", "$$ = new Int(yytext)"],
+                                ["TRUE", "$$ = new Bool(true)"],
+                                ["False", "$$ = new Bool(false)"],
+                                ["LBRACK lista_expresiones RBRACK", "$$ = new ExprVecLength($2)"],
+                                ["HASH ID", "$$ = new ExprVecLength($2)"],
+                                ["ID LBRACK expresion RBRACK", "$$ = new ExprVecDeref($1, $3)"],
+                                ["ID LPAREN lista_expresiones RPAREN", "$$ = new ExprVecDeref($1, $3)"],
+                                ["LPAREN expresion RPAREN", "$$ = $2"] ],
+
+        "expresion_multiplicativa": [ ["expresion_multiplicativa TIMES expresion_atomica", "$$ = new Mult($1,$3)"],
+                                      ["expresion_atomica", "$$ = $1"] ],
+
+        "expresion_aditiva": [ ["expresion_aditiva PLUS expresion_multiplicativa", "$$ = new Plus($1,$3)"],
+                               ["expresion_aditiva MINUS expresion_multiplicativa", "$$ = new Minus($1,$3)"],
+                               ["expresion_multiplicativa", "$$ = $1"] ],
+
+        "expresion_relacional": [   ["expresion_aditiva LE expresion_aditiva", "$$ = new Plus($1,$3)"],
+                                    ["expresion_aditiva GE expresion_aditiva", "$$ = new Minus($1,$3)"],
+                                    ["expresion_aditiva LT expresion_aditiva", "$$ = new Minus($1,$3)"],
+                                    ["expresion_aditiva GT expresion_aditiva", "$$ = new Minus($1,$3)"],
+                                    ["expresion_aditiva EQ expresion_aditiva", "$$ = new Minus($1,$3)"],
+                                    ["expresion_aditiva NE expresion_aditiva", "$$ = new Minus($1,$3)"],
+                                    ["expresion_aditiva", "$$ = $1"] ],
+
+        "expresion_logica_atomica": [ ["NOT expresion_logica_atomica", "$$ = $2"],
+                                      ["expresion_relacional", "$$ = $1"] ],
+
+        "expresion_logica": [ ["expresion_logica AND expresion_logica_atomica", "$$ = $2"],
+                                ["expresion_logica OR expresion_logica_atomica", "$$ = $2"],
+                                ["expresion_logica_atomica ", "$$ = $1"], ],
+
     }
 }
