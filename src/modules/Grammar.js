@@ -45,7 +45,7 @@ export default {
     ],
 
     // "start": "ALL",
-    "tokens": "( ) { } [ ] :",
+    //"tokens": "( ) { } [ ] :",
 
     "bnf": {
 
@@ -56,7 +56,7 @@ export default {
             ["block EOF", "return $1"],  
         ],
 
-        "function": [[ "FUNC ID ( lista_paramametros ) block", "$$ = new Func($2, '', $4, $6);" ]],
+        "function": [[ "FUNC ID LPAREN lista_paramametros RPAREN block", "$$ = new Func($2, '', $4, $6);" ]],
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
