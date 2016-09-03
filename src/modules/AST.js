@@ -222,12 +222,20 @@ class StmtAssign extends ASTType{
 		this.id = id
 		this.expresion = expresion
 	}
+
+	toString(){
+		return this.name + "=" + this.expresion 
+	}
 }
 
 class StmtVecAssign  extends BinaryExpr{
 	constructor(id, x, y){
 		super(x, y)
 		this.id = id
+	}
+
+	toString(){
+		return this.id + super.toString
 	}
 }
 
@@ -237,12 +245,20 @@ class StmtIf extends ASTType{
 		this.expresion = expresion
 		this.block = block
 	}
+
+	toString(){
+		return this.constructor.name + "(" + this.x+")"
+	}
 }
 
 class StmtIfElse extends StmtIf{
 	constructor(expresion, block, elseBlock){
 		super(expresion, block)
 		this.elseBlock = elseBlock
+	}
+
+	toString(){
+		return this.constructor.name + "(" + this.x+")"
 	}
 }
 
@@ -251,6 +267,10 @@ class StmtWhile extends ASTType{
 		super()
 		this.expresion = expresion
 		this.block = block
+	}
+
+	toString(){
+		return this.constructor.name + "(" + this.x+")"
 	}
 }
 
@@ -262,6 +282,10 @@ class StmtCall extends ASTType{
 		super()
 		this.id = id
 		this.expresions = expresions
+	}
+
+	toString(){
+		return this.constructor.name + "(" + this.x+")"
 	}
 }
 
