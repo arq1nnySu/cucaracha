@@ -33,14 +33,7 @@ class ExprConstBool{
 	}
 }
 
-class Program{
-	constructor(functions){
-		this.functions = functions;
-	}
-
-	toString(){
-		return this.functions.join(', ')
-	}
+class Program extends Arrays{
 }
 
 class Fun{
