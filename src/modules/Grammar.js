@@ -53,14 +53,12 @@ export default {
         ["left", "AND", "OR"]
     ],
 
-    "tokens": "( ) { } [ ] :",
+    //"tokens": "( ) { } [ ] :",
 
     "bnf": {
 
         "expressions": [
-            ["function ", "return $1"],
-            ["block", "return $1"],  
-            ["lista_expresiones EOF", "return $1"]
+            ["lista_instrucciones EOF", "return $1"]
         ],
 
         "function": [[ "FUN ID LPAREN lista_paramametros RPAREN block", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
@@ -69,7 +67,17 @@ export default {
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
                  [ "VEC", "$$ = new VecType();" ]],
+        
+        "instruccion" : [["ID ASSIGN expresion", "$$ = new Param($1, $3);"],
+                         ["ID LBRACK expresion RBRACK ASSIGN expresion", "$$ = new Param($1, $3);"],
+                         ["IF expresion block", "$$ = new Param($2, $3);"],
+                         ["IF expresion block ELSE block", "$$ = new Param($3, $4);"],
+                         ["WHILE expresion block", "$$ = new Param($2, $3);"],
+                         ["RETURN expresion", "$$ = new Param($1, $2);"],
+                         ["ID LPAREN lista_expresiones RPAREN", "$$ = new Param($1, $3);"]],
 
+        "lista_instrucciones" : [[ "", "$$ = new Instructions([]);" ],
+                                 [ "instruccion lista_instrucciones", "$$ = $2.add($1);" ]],
 
         "parametro": [[ "ID COLON tipo", "$$ = new Param($1, $3);" ]],
 

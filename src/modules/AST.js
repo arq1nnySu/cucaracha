@@ -107,6 +107,35 @@ class Param{
 	}
 }
 
+class Instructions{
+	
+	constructor(statements){
+		this.statements = statements;
+	}
+
+	toString(){
+		return "Instructions("+this.statements.join(" ")+")"
+	}
+
+	add(param){
+		this.statements.unshift(param)
+		return this
+	}
+
+	eval(){
+		return ""
+	}
+}
+
+//class Instruction{
+//	constructor(name, ){
+//	}
+//
+//	toString(){
+//		return this.name+":"+this.type	
+//	}
+//}
+
 
 class Arithmetic{
 
@@ -206,5 +235,5 @@ window.ExprVecLength = ExprVecLength
 window.ExprVecDeref = ExprVecDeref
 window.ExprVar = ExprVar
 window.VoidType = VoidType
-
+window.Instructions = Instructions
 export default { }
