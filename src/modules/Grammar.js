@@ -4,28 +4,30 @@ export default {
     "lex": {
         "rules": [
             ["\\s+", "/* skip whitespace */"],            
-            ["\\^", "return '^'"],
-            ["!", "return '!'"],
-            ["%", "return '%'"],
-            ["PI\\b", "return 'PI'"],
-            ["E\\b", "return 'E'"],
             ["$", "return 'EOF'"],
-            //
             ["[0-9]+", "return 'NUMBER'"],
-            // [":=", "return ':='"],
-            ["\\*", "return '*'"],
-            ["\\/", "return '/'"],
-            ["-", "return '-'"],
-            ["\\+", "return '+'"],
-            ["!", "return '!'"],
-            ["\\{", "return '{'"],
-            ["\\}", "return '}'"],
-            ["\\(", "return '('"],
-            ["\\)", "return ')'"],
-            ["\\{", "return '{'"],
-            ["\\}", "return '}'"],
+
+            ["\\(", "return 'LPAREN'"],
+            ["\\)", "return 'RPAREN'"],
+            ["\\[", "return 'LBRACK'"],
+            ["\\]", "return 'RBRACK'"],
+            ["\\{", "return 'LBRACE'"],
+            ["\\}", "return 'RBRACE'"],
             ["\\,", "return 'COMMA'"],
+            ["\\:=", "return 'ASSIGN'"],
             ["\\:", "return 'COLON'"],
+            ["\\#", "return 'HASH'"],
+            ["\\<=", "return 'LE'"], 
+            ["\\>=", "return 'LE'"], 
+            ["\\<", "return 'LT'"], 
+            ["\\>", "return 'GT'"], 
+            ["\\==", "return 'EQ'"], 
+            ["\\!=", "return 'NE'"], 
+            ["\\+", "return 'PLUS'"],   
+            ["\\-", "return 'MINUS'"],  
+            ["\\*", "return 'TIMES'"], 
+            ["\\/", "return 'DIV'"],
+
             ["True", "return 'TRUE'"],
             ["False", "return 'FALSE'"],
             ["Bool", "return 'BOOL'"],
@@ -38,12 +40,8 @@ export default {
     },
 
     "operators": [
-        ["left", "+", "-"],
-        ["left", "*", "/"],
-        ["left", "^"],
-        ["right", "!"],
-        ["right", "%"],
-        ["left", "UMINUS"]
+        ["left", "PLUS", "MINUS"],
+        ["left", "TIMES", "DIV"]
     ],
 
     // "start": "ALL",
@@ -73,23 +71,14 @@ export default {
                                 [ "lista_no_vacia", "$$ = $1;" ]],
 
 
-        "block": [ ["{ }", "$$ = new Block([])"] ],
+        "block": [ ["LBRACE RBRACE", "$$ = new Block([])"] ],
         
         "e": [
-            
-            ["e ^ e", "$$ = Math.pow($1, $3)"],
-            ["e !", "$$ = (function(n) {if(n==0) return 1; return arguments.callee(n-1) * n})($1)"],
-            ["e %", "$$ = $1/100"],
-            ["- e", "$$ = -$2", { "prec": "UMINUS" }],
-            ["E", "$$ = Math.E"],
-            ["PI", "$$ = Math.PI"],
-            //
-            //["e + e", "$$ = new Suma($1, $3)"],
-            ["e + e", "$$ = new Suma($1, $3)"],
-            ["e - e", "$$ = new Resta($1, $3)"],
-            ["e * e", "$$ = new Mult($1,$3)"],
-            ["e / e", "$$ = new Div($1,$3)"],
-            ["( e )", "$$ = $2"],
+            ["e PLUS e", "$$ = new Suma($1, $3)"],
+            ["e MINUS e", "$$ = new Resta($1, $3)"],
+            ["e TIMES e", "$$ = new Mult($1,$3)"],
+            ["e DIV e", "$$ = new Div($1,$3)"],
+            ["LPAREN e RPAREN", "$$ = $2"],
             // ["ID := e", "$$ = new Assign($1, $3)"],
             ["NUMBER", "$$ = new Int(yytext)"],
             ["BOOL", "$$ = new Bool(yytext)"],
