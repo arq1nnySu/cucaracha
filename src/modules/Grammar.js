@@ -65,7 +65,8 @@ export default {
             ["block EOF", "return $1"],  
         ],
 
-        "function": [[ "FUNC ID LPAREN lista_paramametros RPAREN block", "$$ = new Func($2, '', $4, $6);" ]],
+        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN block", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
+                     [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo block", "$$ = new Fun($2, $7, $4, $8);" ]],
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
