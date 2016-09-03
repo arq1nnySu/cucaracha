@@ -27,13 +27,21 @@ export default {
             ["\\-", "return 'MINUS'"],  
             ["\\*", "return 'TIMES'"], 
             ["\\/", "return 'DIV'"],
+            ["and", "return 'AND'"],
+            ["else", "return 'ELSE'"],
+            ["fun", "return 'FUN'"],
+            ["if", "return 'IF'"],
+            ["not", "return 'NOT'"],
+            ["or", "return 'OR'"],
+            ["return", "return 'RETURN'"],
+            ["while", "return 'WHILE'"],
 
             ["True", "return 'TRUE'"],
             ["False", "return 'FALSE'"],
             ["Bool", "return 'BOOL'"],
             ["Int", "return 'INT'"],
             ["Vec", "return 'VEC'"],
-            ["function", "return 'FUNC'"],
+            
             ["[a-zA-Z][ a-zA-Z0-9]*", "return 'ID'"],
             ["^$", "return 'ε'"],
         ]
@@ -41,7 +49,8 @@ export default {
 
     "operators": [
         ["left", "PLUS", "MINUS"],
-        ["left", "TIMES", "DIV"]
+        ["left", "TIMES", "DIV"],
+        ["left", "AND", "OR"]
     ],
 
     // "start": "ALL",

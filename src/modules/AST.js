@@ -62,7 +62,7 @@ class Program{
 	}
 }
 
-class Func{
+class Fun{
 	constructor(name, type, parameters, block){
 		this.name = name
 		this.type = type
@@ -170,7 +170,7 @@ window.Mult = Mult
 window.Div = Div
 window.Bool = Bool
 window.Bool = Id
-window.Func = Func
+window.Fun = Fun
 window.Assign = Assign
 window.Params = Params
 window.Param = Param
