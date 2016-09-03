@@ -9,7 +9,7 @@ class BoolType extends ASTType {}
 class VecType extends ASTType {}
 class VoidType extends ASTType {}
 
-class Int{
+class ExprConstNum{
 	constructor(value){
 		this.value = Number(value);
 	}
@@ -23,17 +23,7 @@ class Int{
 	}	
 }
 
-class Id{
-	constructor(value){
-		this.value = value;
-	}
-
-	toString(){
-		return this.value
-	}	
-}
-
-class Bool{
+class ExprConstBool{
 	constructor(value){
 		this.value = value
 	}
@@ -54,15 +44,15 @@ class Program{
 }
 
 class Fun{
-	constructor(name, type, parameters, block){
-		this.name = name
+	constructor(id, type, parameters, block){
+		this.id = id
 		this.type = type
 		this.parameters = parameters
 		this.block = block
 	}
 
 	toString(){
-		return this.name + "(" + this.parameters +") :" 
+		return this.id + "(" + this.parameters +") :" 
 			+ this.type +"" + this.block
 	}
 }
@@ -77,17 +67,14 @@ class Block{
 	}
 }
 
-class Params{
-	constructor(statements){
-		this.statements = statements;
-	}
-
-	toString(){
-		return "Params("+this.statements.join(", ")+")"
+class Arrays extends Array{
+	constructor(value){
+		super()
+		this.add(value)
 	}
 
 	add(param){
-		this.statements.unshift(param)
+		this.unshift(param)
 		return this
 	}
 
@@ -96,14 +83,14 @@ class Params{
 	}
 }
 
-class Param{
-	constructor(name, type){
-		this.name = name;
+class Parameter{
+	constructor(id, type){
+		this.id = id;
 		this.type = type
 	}
 
 	toString(){
-		return this.name+":"+this.type
+		return this.id+":"+this.type
 	}
 }
 
@@ -127,26 +114,35 @@ class Instructions{
 	}
 }
 
-//class Instruction{
-//	constructor(name, ){
-//	}
-//
-//	toString(){
-//		return this.name+":"+this.type	
-//	}
-//}
+class UnaryExpr extends ASTType{
 
-
-class Arithmetic{
-
-	constructor(x, y, operator){
+	constructor(x){
+		super()
 		this.x = x;
-		this.y = y;
-		this.operator = operator
 	}
 	
 	eval(){
-		return eval(this.x.eval() + this.operator + this.y.eval())
+		return this
+	}
+
+	toString(){
+		return this.constructor.name + "(" + this.x+")"
+	}
+}
+
+
+class BinaryExpr extends ASTType{
+
+	constructor(x, y){
+		super()
+		this.x = x;
+		this.y = y;
+		// this.operator = operator
+	}
+	
+	eval(){
+		// return eval(this.x.eval() + this.operator + this.y.eval())
+		return this
 	}
 
 	toString(){
@@ -154,32 +150,27 @@ class Arithmetic{
 	}
 }
 
-class Plus extends Arithmetic{
-	constructor(x, y){
-		super(x, y, "+")
-	}
-}
+class ExprAdd extends BinaryExpr{}
+class ExprSub extends BinaryExpr{}
+class ExprNe extends BinaryExpr{}
+class ExprEq extends BinaryExpr{}
+class ExprLt extends BinaryExpr{} 
+class ExprGe extends BinaryExpr{} 
+class ExprLe extends BinaryExpr{} 
+class ExprMul extends BinaryExpr{}
+class ExprOr extends BinaryExpr{}
+class ExprAnd extends BinaryExpr{}
 
-class Minus extends Arithmetic{
-	constructor(x, y){
-		super(x, y, "-")
-	}
-}
+class Div extends BinaryExpr{}
+class Assign extends BinaryExpr{}
 
-class Mult extends Arithmetic{
-	constructor(x, y){
-		super(x, y, "*")
-	}
-}
-class Div extends Arithmetic{
-	constructor(x, y){
-		super(x, y, "/")
-	}
-}
+class ExprNot  extends UnaryExpr{}
 
-class Assign extends Arithmetic{
-	constructor(x, y){
-		super(x, y, ":=")
+class ExprCall extends ASTType{
+	constructor(id, expressions){
+		super()
+		this.id = id
+		this.expresions = expresion
 	}
 }
 
@@ -216,18 +207,76 @@ class ExprVecDeref extends ASTType{
 	}
 }
 
-window.Int = Int
-window.Plus = Plus
-window.Minus = Minus
-window.Mult = Mult
+class ExprVecMake extends ASTType{
+	constructor(expresion){
+		super()
+		this.expresions = expresions
+	}
+}
+
+//Statements
+
+class StmtAssign extends ASTType{
+	constructor(id, expresion){
+		super()
+		this.id = id
+		this.expresion = expresion
+	}
+}
+
+class StmtVecAssign  extends BinaryExpr{
+	constructor(id, x, y){
+		super(x, y)
+		this.id = id
+	}
+}
+
+class StmtIf extends ASTType{
+	constructor(expresion, block){
+		super()
+		this.expresion = expresion
+		this.block = block
+	}
+}
+
+class StmtIfElse extends StmtIf{
+	constructor(expresion, block, elseBlock){
+		super(expresion, block)
+		this.elseBlock = elseBlock
+	}
+}
+
+class StmtWhile extends ASTType{
+	constructor(expresion, block){
+		super()
+		this.expresion = expresion
+		this.block = block
+	}
+}
+
+class StmtReturn extends UnaryExpr{}
+
+
+class StmtCall extends ASTType{
+	constructor(id, expresions){
+		super()
+		this.id = id
+		this.expresions = expresions
+	}
+}
+
+window.ExprConstNum = ExprConstNum
+window.ExprAdd = ExprAdd
+window.ExprSub = ExprSub
+window.ExprMul = ExprMul
 window.Div = Div
-window.Bool = Bool
-window.Id = Id
+window.ExprConstBool = ExprConstBool
 window.Fun = Fun
 window.Assign = Assign
-window.Params = Params
-window.Param = Param
+window.Arrays = Arrays
+window.Parameter = Parameter
 window.Block = Block
+window.ExprConstBool = ExprConstBool
 window.IntType = IntType
 window.BoolType = BoolType
 window.VecType = VecType
@@ -236,4 +285,7 @@ window.ExprVecDeref = ExprVecDeref
 window.ExprVar = ExprVar
 window.VoidType = VoidType
 window.Instructions = Instructions
+window.StmtAssign = StmtAssign
+
+
 export default { }
