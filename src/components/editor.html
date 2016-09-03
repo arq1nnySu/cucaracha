@@ -7,20 +7,14 @@
     
 <dom-module id="cucaracha-editor">
   <template>
-  <style>
-    :host {
-      display: block;
-      width: 100%;
-    }
-    </style>
     <ace-widget
         id="ace"
         mode="ace/mode/cucaracha"
         theme="ace/theme/chrome"
         font-size="18"
         tab-size="4"
-        minlines="10"
-        maxlines="10"
+        minlines="12"
+        maxlines="12"
         initial-focus
     >
 fun main() { 
@@ -32,9 +26,9 @@ fun main() {
 }
 
     </ace-widget>
-    <div style="top: 53%; position:absolute;">
-        <input type="button"  value="Parsear" on-click="runCode"></input>
-        <p id="result"></p>    
+    <div class="result_container">
+        <div><input type="button"  value="Parsear" on-click="runCode"></input></div>
+        <div><textarea class="result_code" id="result"></textarea></div>
     </div>
     
   </template>
