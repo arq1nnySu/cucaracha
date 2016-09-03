@@ -54,6 +54,7 @@ export default {
     ],
 
     // "start": "ALL",
+    "tokens": "( ) { } [ ] :",
 
     "bnf": {
 
@@ -64,7 +65,7 @@ export default {
             ["block EOF", "return $1"],  
         ],
 
-        "function": [[ "FUN ID lista_paramametros", "$$ = new Func($2, '', $3, {});" ]],
+        "function": [[ "FUN ID ( lista_paramametros ) block", "$$ = new Fun($2, '', $4, $6);" ]],
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
                  [ "BOOL", "$$ = new BoolType();" ],
@@ -78,7 +79,6 @@ export default {
 
         "lista_paramametros": [ [ "ε", "$$ = new Params([]);" ], 
                                 [ "lista_no_vacia", "$$ = $1;" ]],
-
 
         "block": [ ["LBRACE RBRACE", "$$ = new Block([])"] ],
         
