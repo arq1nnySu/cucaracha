@@ -72,7 +72,7 @@ class Block{
 	}
 
 	toString(){
-		return this.statements.join(', ')
+		return "Block (" +this.statements.join(', ') + " )"
 	}
 }
 
@@ -132,5 +132,6 @@ window.Bool = Bool
 window.Bool = Id
 window.Func = Func
 window.Assign = Assign
+window.Block = Block
 
 export default { Int, Arithmetic, Sum, Resta, Mult, Div, Bool, Id, Func, Assign}

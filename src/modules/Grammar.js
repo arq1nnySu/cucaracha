@@ -21,6 +21,8 @@ export default {
             ["-", "return '-'"],
             ["\\+", "return '+'"],
             ["!", "return '!'"],
+            ["\\{", "return '{'"],
+            ["\\}", "return '}'"],
             ["\\(", "return '('"],
             ["\\)", "return ')'"],
             ["True|False", "return 'BOOL'"],
@@ -38,10 +40,14 @@ export default {
     ],
 
     "bnf": {
+
         "expressions": [
+            ["block EOF", "return $1"],  
             ["e EOF", "return $1"]
         ],
 
+        "block": [ ["{ }", "$$ = new Block([])"] ],
+        
         "e": [
             
             ["e ^ e", "$$ = Math.pow($1, $3)"],
