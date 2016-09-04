@@ -39,64 +39,81 @@ class Serializer{
 		var sname = statement.constructor.name
 		switch(sname) {
 			case "StmtAssign":
-				this.assignString(statement, level)
-				break;
+				return this.assignString(statement, level)
     		case "StmtVecAssign":
-        		this.vecAssignString(statement, level)
-        		break;
+    			return this.vecAssignString(statement, level)
         	case "StmtIf":
-        		this.ifString(statement, level)
-        		break;
+        		return this.ifString(statement, level)
         	case "StmtIfElse":
-				this.ifElseString(statement, level)
-				break;
+        		return this.ifElseString(statement, level)
     		case "StmtWhile":
-        		this.whileString(statement, level)
-        		break;
+    			return this.whileString(statement, level)
     		case "StmtReturn":
-        		this.returnString(statement, level)
-        		break;
+    			return this.returnString(statement, level)
         	case "StmtCall":
-        		this.callString(statement, level)
-				break;
+        		return this.callString(statement, level)
     		default:
-    		   // ?
+    		   return "INVALID"
     	}
     }
 
-    assignString(assign, leve){
-		//return block.toString(level)
+    assignString(assign, level){
+    	var tab = level
+		var rep = "(" + assign.constructor.name + ENTER 
+		           + Indents.indent(assign.id, tab+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
+		           + ")"
+		return Indents.indent(rep, tab+1)
 	}
 
 	vecAssignString(vecAssign, level){
-		//return block.toString(level)
+		var tab = level
+		var rep = "(" + vecAssign.constructor.name + ENTER 
+		           + Indents.indent(vecAssign.id, tab+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
+		           + ")"
+		return Indents.indent(rep, tab+1)
 	}
 
-	ifString(if, level){
-		//return block.toString(level)
-	}
-
-	ifElseString(ifElse, level){
-		//return block.toString(level)
-	}
-
-	whileString(while, level){
-		//return block.toString(level)
-	}
-
-	returnString(return, level){
-		//return block.toString(level)
-	}
-
-	callString(call, level){
+    callString(call, level){
 		var tab = level
 		var rep = "(" + call.constructor.name + ENTER
 		           + Indents.indent(call.id, tab) + ENTER
-		           + call.expresions.map(s => s.toString(tab)).join(ENTER) + ENTER
+		           + call.expresions.map(e => this.expresionString(e,tab)).join(ENTER) + ENTER
 		           + ")"
 		return Indents.indent(rep, tab)
 	}
 
+
+	expresionString(expresion, level){
+		var ename = expresion.constructor.name
+		switch(ename) {
+			case "ExprConstNum":
+				return this.constString(expresion, level)
+    		case "ExprConstBool":
+    			return this.constString(expresion, level)
+        	case "UnaryExpr":
+        		return this.unaryString(expresion, level)
+        	case "BinaryExpr":
+        		return this.binaryString(expresion, level)
+    		case "StmtWhile":
+    			return this.whileString(expresion, level)
+    		case "StmtReturn":
+    			return this.returnString(expresion, level)
+        	case "StmtCall":
+        		return this.callString(expresion, level)
+    		default:
+    		   return "INVALID"
+    	}
+    }
+
+    constString(constant, level){
+    	var rep = constant.value + ENTER 
+    	return Indents.indent(rep, level)
+    }
+
+    unaryString(unary, level){
+    	var rep = unary.x + "\n" 
+    	return Indents.indent(rep, level)
+    }
 }
 
 export default new Serializer()

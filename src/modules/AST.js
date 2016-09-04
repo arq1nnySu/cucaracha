@@ -52,15 +52,7 @@ class Fun{
 class Block{
 	constructor(statements){
 		this.statements = statements;
-	}
-
-	toString(n){
-		var tab = n
-		var rep = "(" + this.constructor.name + "\n" 
-		           + this.statements.map(s => s.toString(tab)).join("\n") 
-		           + "\n)"
-		return Indents.indent(rep, tab+1)
-	}
+	}	
 }
 
 class Arrays extends Array{
@@ -122,7 +114,7 @@ class UnaryExpr extends ASTType{
 	}
 
 	toString(){
-		return this.constructor.name + "(" + this.x+")"
+		return  this.x 
 	}
 }
 
