@@ -124,7 +124,7 @@ class Serializer{
         	case "ExprVecDeref":
         		return this.expVecDerefString(expresion, level)
         	case "ExprCall":
-        		return "INVALID"
+        		return this.expCallString(expresion, level)
         	case "ExprAnd":
         		return this.binaryExpString(expresion, level)
         	case "ExprOr":
@@ -209,16 +209,10 @@ class Serializer{
     	return rep.tab(level+1)	
     }
 
-    notExpString(nots, level){
-    	var rep = "(" + nots.constructor.name + ENTER
-    				+ this.expresionString(nots.x, level) + ENTER
-    				+ ")"	
-    	return rep.tab(level+1)	
-    }
-
-    notExpString(nots, level){
-    	var rep = "(" + nots.constructor.name + ENTER
-    				+ this.expresionString(nots.x, level) + ENTER
+    expCallString(expCall, level){
+    	var rep = "(" + expCall.constructor.name + ENTER
+    				+ expCall.id.tab(level+1) + ENTER 
+    				+ expCall.expresions.map(s => this.expresionString(s,level)).join(ENTER) + ENTER
     				+ ")"	
     	return rep.tab(level+1)	
     }
