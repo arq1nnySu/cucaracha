@@ -5,18 +5,17 @@ const ENTER = "\n"
 class Serializer{
 
 	serialize(program){
-		return "(Program "+ ENTER + program.map(f => this.functionString(f, 1)).join(ENTER) + ENTER+")"
+		return "(Program "+ ENTER + program.map(f => this.functionString(f, 0)).join(ENTER) + ENTER+")"
 	}
 
 	functionString(fun, level){
-		var tab = level+1
 		var rep =  "(Function "+ENTER 
-		           + Indents.indent(fun.id, tab+1) + ENTER 
-		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, tab)).join(ENTER)+ENTER :"")
-		           + this.typeString(fun.type, tab) + ENTER
-		           + this.blockString(fun.block, tab) + ENTER
+		           + Indents.indent(fun.id, level+1) + ENTER 
+		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, level)).join(ENTER)+ENTER :"")
+		           + this.typeString(fun.type, level) + ENTER
+		           + this.blockString(fun.block, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, tab)
+		return Indents.indent(rep, level+1)
 	}
 
 	paramString(param, level){
@@ -28,11 +27,10 @@ class Serializer{
 	}
 
 	blockString(block, level){
-		var tab = level
 		var rep = "(" + block.constructor.name + ENTER 
-		           + block.statements.map(s => this.statementString(s,tab)).join(ENTER) + ENTER
+		           + block.statements.map(s => this.statementString(s,level)).join(ENTER) + ENTER
 		           + ")"
-		return Indents.indent(rep, tab+1)
+		return Indents.indent(rep, level+1)
 	}
 
 	statementString(statement, level){
@@ -58,19 +56,17 @@ class Serializer{
     }
 
     assignString(assign, level){
-    	var tab = level
 		var rep = "(" + assign.constructor.name + ENTER 
-		           + Indents.indent(assign.id, tab+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
+		           + Indents.indent(assign.id, level+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, tab+1)
+		return Indents.indent(rep, level+1)
 	}
 
 	vecAssignString(vecAssign, level){
-		var tab = level
 		var rep = "(" + vecAssign.constructor.name + ENTER 
-		           + Indents.indent(vecAssign.id, tab+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
+		           + Indents.indent(vecAssign.id, level+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, tab+1)
+		return Indents.indent(rep, level+1)
 	}
 	
 	expBlockString(exp, level){
@@ -95,12 +91,11 @@ class Serializer{
 	}
 
 	callString(call, level){
-		var tab = level
 		var rep = "(" + call.constructor.name + ENTER
-		           + Indents.indent(call.id, tab) + ENTER
-		           + call.expresions.map(e => this.expresionString(e,tab)).join(ENTER) + ENTER
+		           + Indents.indent(call.id, level+1) + ENTER
+		           + call.expresions.map(e => this.expresionString(e,level)).join(ENTER) + ENTER
 		           + ")"
-		return Indents.indent(rep, tab)
+		return Indents.indent(rep, level+1)
 	}
 
 	expresionString(expresion, level){
@@ -121,18 +116,18 @@ class Serializer{
         	case "StmtCall":
         		return this.callString(expresion, level)
     		default:
-    		   return "INVALID"
+    		   return Indents.indent(expresion.toString(), level+1)
     	}
     }
 
     constString(constant, level){
     	var rep = constant.value + ENTER 
-    	return Indents.indent(rep, level)
+    	return Indents.indent(rep, level+1)
     }
 
     unaryString(unary, level){
-    	var rep = unary.x + "\n" 
-    	return Indents.indent(rep, level)
+    	var rep = unary.x + ENTER
+    	return Indents.indent(rep, level+1)
     }
 }
 

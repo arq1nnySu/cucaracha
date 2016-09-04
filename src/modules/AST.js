@@ -65,20 +65,12 @@ class Arrays extends Array{
 		this.unshift(param)
 		return this
 	}
-
-	eval(){
-		return ""
-	}
 }
 
 class Parameter{
 	constructor(id, type){
 		this.id = id;
 		this.type = type
-	}
-
-	toString(){
-		return this.id+":"+this.type
 	}
 }
 
@@ -88,17 +80,9 @@ class Instructions{
 		this.statements = statements;
 	}
 
-	toString(){
-		return "Instructions("+this.statements.join(" ")+")"
-	}
-
 	add(param){
 		this.statements.unshift(param)
 		return this
-	}
-
-	eval(){
-		return ""
 	}
 }
 
@@ -107,14 +91,6 @@ class UnaryExpr extends ASTType{
 	constructor(x){
 		super()
 		this.x = x;
-	}
-	
-	eval(){
-		return this
-	}
-
-	toString(){
-		return  this.x 
 	}
 }
 
@@ -125,16 +101,6 @@ class BinaryExpr extends ASTType{
 		super()
 		this.x = x;
 		this.y = y;
-		// this.operator = operator
-	}
-	
-	eval(){
-		// return eval(this.x.eval() + this.operator + this.y.eval())
-		return this
-	}
-
-	toString(){
-		return this.constructor.name + "(" + this.x+", " + this.y+")"
 	}
 }
 
@@ -168,35 +134,21 @@ class ExprVecLength extends ASTType{
 		super()
 		this.id = id
 	}
-	
-	toString(){
-		return this.id+".length"
-	}
-
 }
+
 class ExprVar extends ASTType{
 	constructor(id){
 		super()
 		this.id = id
 	}
 	
-	toString(n){
-		var tab = n
-		var rep = "(" + this.constructor.name + "\n"   
-		           + Indents.indent(this.id, tab, 2) + "\n"
-		           + ")"
-		return Indents.indent(rep, tab)
-	}
 }
+
 class ExprVecDeref extends ASTType{
 	constructor(id, expresion){
 		super()
 		this.id = id
 		this.expresion = expresion
-	}
-	
-	toString(){
-		return this.id+"["+this.expresion+"]"
 	}
 }
 
@@ -216,19 +168,12 @@ class StmtAssign extends ASTType{
 		this.expresion = expresion
 	}
 
-	toString(){
-		return this.constructor.name + "(" + this.id + "= " + this.expresion + ")" 
-	}
 }
 
 class StmtVecAssign  extends BinaryExpr{
 	constructor(id, x, y){
 		super(x, y)
 		this.id = id
-	}
-
-	toString(){
-		return this.constructor.name + "(" + this.id + "[" + this.x + "]= " + this.y + ")" 
 	}
 }
 
@@ -238,20 +183,12 @@ class StmtIf extends ASTType{
 		this.expresion = expresion
 		this.block = block
 	}
-
-	toString(){
-		return this.constructor.name + "((" + this.expresion + ") { " + this.block + " })" 
-	}
 }
 
 class StmtIfElse extends StmtIf{
 	constructor(expresion, block, elseBlock){
 		super(expresion, block)
 		this.elseBlock = elseBlock
-	}
-
-	toString(){
-		return this.constructor.name + "((" + this.expresion + ") { " + this.block + "} {" + this.elseBlock + "})"
 	}
 }
 
@@ -260,10 +197,6 @@ class StmtWhile extends ASTType{
 		super()
 		this.expresion = expresion
 		this.block = block
-	}
-
-	toString(){
-		return this.constructor.name + "((" + this.expresion + ") {" + this.block + "})"
 	}
 }
 
@@ -275,15 +208,6 @@ class StmtCall extends ASTType{
 		super()
 		this.id = id
 		this.expresions = expresions
-	}
-
-	toString(n){
-		var tab = n
-		var rep = "(" + this.constructor.name + "\n" 
-		           + Indents.indent(this.id, tab, 2) + "\n"
-		           + this.expresions.map(s => s.toString(tab)).join("\n")
-		           + "\n)"
-		return Indents.indent(rep, tab)
 	}
 }
 
