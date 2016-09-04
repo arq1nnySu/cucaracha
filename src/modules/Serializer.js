@@ -77,28 +77,25 @@ class Serializer{
 	}
 	
 	expBlockString(exp, level){
-		var tab = level
 		var rep = "(" + exp.constructor.name + "(" + this.expresionString(exp.expresion, level) + ")" + ENTER
 		           + this.blockString(exp.block, level)  + ENTER
 		           + ")"
-		return Indents.indent(rep, tab)
+		return rep.tab(level+1)
 	}
 
 	ifElseString(ifElsest, level){
-		var tab = level
 		var rep = "(" + ifElsest.constructor.name + "(" + this.expresionString(ifElsest.expresion, level) + ")" + ENTER
 		           + this.blockString(ifElsest.block, level)  + ENTER
 		           + this.blockString(ifElsest.elseBlock, level)  + ENTER
 		           + ")"
-		return Indents.indent(rep, tab)
+		return rep.tab(level+1)
 	}
 
 	returnString(returnst, level){
-		var tab = level
 		var rep = "(" + returnst.constructor.name + ENTER
 					  + this.expresionString(returnst.x, level) + ENTER
 					  + ")" 
-		return Indents.indent(rep, tab)
+		return rep.tab(level+1)
 	}
 
 	callString(call, level){
@@ -112,20 +109,44 @@ class Serializer{
 	expresionString(expresion, level){
 		var ename = expresion.constructor.name
 		switch(ename) {
+			case "ExprVar":
+				return this.constString(expresion, level)
 			case "ExprConstNum":
 				return this.constString(expresion, level)
     		case "ExprConstBool":
     			return this.constString(expresion, level)
-        	case "UnaryExpr":
-        		return this.unaryString(expresion, level)
-        	case "BinaryExpr":
-        		return this.binaryString(expresion, level)
-    		case "StmtWhile":
-    			return this.whileString(expresion, level)
-    		case "StmtReturn":
-    			return this.returnString(expresion, level)
-        	case "StmtCall":
-        		return this.callString(expresion, level)
+        	case "ExprVecMake":
+        		return this.constString(expresion, level)
+			case "ExprVecLength":
+        		return this.constString(expresion, level)
+        	case "ExprVecDeref":
+        		return this.expVecDerefString(expresion, level)
+        	case "ExprCall":
+        		return this.constString(expresion, level)
+        	case "ExprAnd":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprOr":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprNot":
+        		return this.constString(expresion, level)
+        	case "ExprLe":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprGe":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprLt":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprGt":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprEq":
+        		return this.binaryExpString(expresion, level)
+    		case "ExprNe":
+    			return this.binaryExpString(expresion, level)
+    		case "ExprAdd":
+    			return this.binaryExpString(expresion, level)
+        	case "ExprSub":
+        		return this.binaryExpString(expresion, level)
+        	case "ExprMul":	
+        		return this.binaryExpString(expresion, level)
     		default:
     		   return expresion.toString().tab(level+1)
     	}
@@ -140,6 +161,29 @@ class Serializer{
     unaryString(unary, level){
     	var rep = unary.x + ENTER
     	return rep.tab(level+1)
+    }
+
+    expVecDerefString(expVecD, level){
+    	var rep = "(" + expVecD.constructor.name + ENTER
+    				+ expVecD.id.tab(level+1) + ENTER
+    				+ this.expresionString(expVecD.expresion, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)
+    }
+
+    binaryExpString(binary, level){
+    	var rep = "(" + binary.constructor.name + ENTER
+    				+ this.expresionString(binary.x, level) + ENTER
+    				+ this.expresionString(binary.y, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)
+    }
+
+    notExpString(nots, level){
+    	var rep = "(" + nots.constructor.name + ENTER
+    				+ this.expresionString(nots.x, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)	
     }
 }
 
