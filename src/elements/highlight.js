@@ -35,10 +35,6 @@ var CucarachaHighlightRules = function() {
                 regex : "\\-\\-.*$"
             },
             {
-                token : "comment",
-                regex : "#.*$"
-            },
-            {
                 token : "comment", // multi line comment
                 regex : "\\/\\*",
                 next : "comment"
@@ -60,7 +56,7 @@ var CucarachaHighlightRules = function() {
                 regex : "(?:True|False)\\b"
             }, {
                 token : "keyword.operator",
-                regex : ":=|\\.\\.|,|;|\\|\\||\\/\\/|\\+|\\-|\\^|\\*|>|<|>=|=>|==|&&"
+                regex : ":=|\\.\\.|,|;|\\|\\||\\/\\/|\\+|\\-|\\^|\\*|>|<|>=|=>|==|&&|#"
             }, {
                 token : keywordMapper,
                 // TODO: Unicode escape sequences

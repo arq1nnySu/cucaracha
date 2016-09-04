@@ -161,6 +161,7 @@ class ExprLe extends BinaryExpr{}
 class ExprMul extends BinaryExpr{}
 class ExprOr extends BinaryExpr{}
 class ExprAnd extends BinaryExpr{}
+class ExprGt extends BinaryExpr{}
 
 class Div extends BinaryExpr{}
 class Assign extends BinaryExpr{}
@@ -319,7 +320,9 @@ window.ExprNot = ExprNot
 window.ExprEq = ExprEq
 window.ExprAnd = ExprAnd
 window.ExprOr = ExprOr
+window.ExprGt = ExprGt
 window.StmtVecAssign = StmtVecAssign
 window.StmtReturn = StmtReturn
+window.StmtWhile = StmtWhile
 
 export default { }
