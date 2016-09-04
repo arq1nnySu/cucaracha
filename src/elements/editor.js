@@ -34,7 +34,7 @@ Polymer({
           return
         }
 
-        $("#result").html(ast.toString())
+        $("#result").html(ast.serialize())
       },
 
       parse: function(sourceCode) {

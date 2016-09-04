@@ -1,8 +1,10 @@
 import Indents from "../utils/Indents.js";
+import Serializer from "./Serializer.js";
+
 
 class ASTType{
-	toString(n){
-		return Indents.indent(this.constructor.name.replace("Type", ""), n+1, 2)   
+	toString(){
+		return this.constructor.name.replace("Type", "")
 	}
 }
 
@@ -15,28 +17,16 @@ class ExprConstNum{
 	constructor(value){
 		this.value = Number(value);
 	}
-
-	eval(){
-		return this.value
-	}
-
-	toString(){
-		return this.value
-	}	
 }
 
 class ExprConstBool{
 	constructor(value){
 		this.value = value
 	}
-
-	toString(){
-		return this.value
-	}
 }
 
-class Program extends Array
-{	constructor(){
+class Program extends Array{	
+	constructor(){
 		super()
 	}
 
@@ -45,9 +35,8 @@ class Program extends Array
 		return this
 	}
 
-	toString(){
-		return "(Program \n" + 
-		           this.map(f => f.toString(1)).join("\n") + "\n)"
+	serialize(){
+		return Serializer.serialize(this)
 	}
 }
 
@@ -57,26 +46,6 @@ class Fun{
 		this.type = type
 		this.parameters = parameters
 		this.block = block
-	}
-
-
-
-	toStringParams(tab){
-		if (this.parameters.length != 0){ 
-			return Indents.indent(this.parameters, tab, 2) + "\n"
-		}
-		return ""
-	}
-
-	toString(n){
-		var tab = n+1
-		var rep =  "(Function \n" 
-		           + Indents.indent(this.id, tab+1, 2) + "\n" 
-		           + this.toStringParams(tab+1) 
-		           + this.type.toString(tab) + "\n" 
-		           + this.block.toString(tab) + "\n" 
-		           + ")"
-		return Indents.indent(rep, tab)
 	}
 }
 
