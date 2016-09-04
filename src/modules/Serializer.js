@@ -116,13 +116,13 @@ class Serializer{
     		case "ExprConstBool":
     			return this.constString(expresion, level)
         	case "ExprVecMake":
-        		return this.constString(expresion, level)
+        		return "INVALID"
 			case "ExprVecLength":
-        		return this.constString(expresion, level)
+        		return "INVALID"
         	case "ExprVecDeref":
         		return this.expVecDerefString(expresion, level)
         	case "ExprCall":
-        		return this.constString(expresion, level)
+        		return "INVALID"
         	case "ExprAnd":
         		return this.binaryExpString(expresion, level)
         	case "ExprOr":
