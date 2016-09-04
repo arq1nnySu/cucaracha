@@ -112,7 +112,7 @@ class Serializer{
     		case "ExprConstBool":
     			return this.constString(expresion, level)
         	case "ExprVecMake":
-        		return "INVALID"
+        		return this.expVecMakeString(expresion, level)
 			case "ExprVecLength":
         		return "INVALID"
         	case "ExprVecDeref":
@@ -179,6 +179,27 @@ class Serializer{
     				+ this.expresionString(binary.y, level) + ENTER
     				+ ")"	
     	return rep.tab(level+1)
+    }
+
+    notExpString(nots, level){
+    	var rep = "(" + nots.constructor.name + ENTER
+    				+ this.expresionString(nots.x, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)	
+    }
+
+    expVecMakeString(expVecMake, level){
+    	var rep = "(" + expVecMake.constructor.name + ENTER
+    				+ "[" + expVecMake.expresions.map(s => this.expresionString(s,level)).join(ENTER) + "]" + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)	
+    }
+
+    notExpString(nots, level){
+    	var rep = "(" + nots.constructor.name + ENTER
+    				+ this.expresionString(nots.x, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)	
     }
 
     notExpString(nots, level){
