@@ -106,7 +106,7 @@ class Serializer{
 		var ename = expresion.constructor.name
 		switch(ename) {
 			case "ExprVar":
-				return this.constString(expresion, level)
+				return this.expVarString(expresion, level)
 			case "ExprConstNum":
 				return this.constString(expresion, level)
     		case "ExprConstBool":
@@ -124,7 +124,7 @@ class Serializer{
         	case "ExprOr":
         		return this.binaryExpString(expresion, level)
         	case "ExprNot":
-        		return this.constString(expresion, level)
+        		return this.notExpString(expresion, level)
         	case "ExprLe":
         		return this.binaryExpString(expresion, level)
         	case "ExprGe":
@@ -156,6 +156,13 @@ class Serializer{
     unaryString(unary, level){
     	var rep = unary.x + ENTER
     	return rep.tab(level+1)
+    }
+
+    expVarString(expVar, level){
+    	var rep = "(" + expVar.constructor.name + ENTER
+    			   + expVar.id.tab(level+1) + ENTER
+    			   ")"
+    	return rep.tab(level+1)	
     }
 
     expVecDerefString(expVecD, level){
