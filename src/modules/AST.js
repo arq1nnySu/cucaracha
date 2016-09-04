@@ -244,5 +244,8 @@ window.ExprGt = ExprGt
 window.StmtVecAssign = StmtVecAssign
 window.StmtReturn = StmtReturn
 window.StmtWhile = StmtWhile
+window.ExprLe = ExprLe
+window.ExprGe = ExprGe
+window.ExprNe = ExprNe
 
 export default { }

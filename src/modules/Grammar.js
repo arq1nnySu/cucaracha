@@ -134,7 +134,7 @@ export default {
                                       ["expresion_relacional", "$$ = $1"] ],
 
         "expresion_logica": [ ["expresion_logica AND expresion_logica_atomica", "$$ = new ExprAnd($1, $3)"],
-                                ["expresion_logica OR expresion_logica_atomica", "$$ = new ExprOR($1, $3)"],
+                                ["expresion_logica OR expresion_logica_atomica", "$$ = new ExprOr($1, $3)"],
                                 ["expresion_logica_atomica ", "$$ = $1"], ],
 
     }
