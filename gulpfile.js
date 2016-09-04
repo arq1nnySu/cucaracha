@@ -97,6 +97,18 @@ gulp.task('build', function () {
     .pipe(browserSync.reload({stream: true}));
 });
 
+// Transpile all JS to ES5.
+gulp.task('js', function() {
+  return gulp.src(['src/elements/*.{js,html}'])
+   .pipe($.sourcemaps.init())
+   .pipe($.if('*.html', $.crisper({scriptInHead: false}))) // Extract JS from .html files
+   .pipe($.if('*.js', $.babel({
+     presets: ['es2015']
+   })))
+   .pipe($.sourcemaps.write('.'))
+   .pipe(gulp.dest(dist("elements")));
+});
+
 gulp.task('copy', function () {
   var app = gulp.src([
     'src/index.html',
@@ -205,18 +217,6 @@ gulp.task('vulcanize', function() {
     .pipe($.size({title: 'vulcanize'}));
 });
 
-// Transpile all JS to ES5.
-gulp.task('js', function() {
-  return gulp.src(['src/**/*.{js,html}'])
-   .pipe($.sourcemaps.init())
-   .pipe($.if('*.html', $.crisper({scriptInHead: false}))) // Extract JS from .html files
-   .pipe($.if('*.js', $.babel({
-     presets: ['es2015']
-   })))
-   .pipe($.sourcemaps.write('.'))
-   .pipe(gulp.dest(dist()));
-});
-
 
 // Clean output directory
 gulp.task('clean', function() {
@@ -227,9 +227,10 @@ gulp.task('clean', function() {
 gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
-    'build',
     ['copy', 'styles'],
     ['html'],
+    'build',
+    // 'js',
     'vulcanize', // 'cache-config',
     cb);
 });

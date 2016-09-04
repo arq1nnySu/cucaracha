@@ -11,6 +11,8 @@ Polymer({
         this.editor = this.$.ace.editor;
         this._setFatalities();
         this._subscribeToChangeEvents();
+        setTimeout(function() { this.fixEditorHeight(); }.bind(this), 500);
+        $(window).resize(function() { this.fixEditorHeight(); }.bind(this));
       },
 
       onAceReady: function() {
@@ -47,19 +49,20 @@ Polymer({
       interpret: function(ast, initialState) {
       },
 
-      reportError: function(err, type = "error") {
+      reportError: function(err) {
         this.editor.getSession().setAnnotations([{
           row: err.line,
           column: err.loc.first_column,
           text: "Error en la linea "+ err.line + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
-          type: type
+          type: 'error'
         }]);
       },
 
       _subscribeToChangeEvents: function() {
-        this.editor.getSession().on("change", () => {
-          this.editor.getSession().setAnnotations([]);
-        });
+        // this.editor.getSession().on("change", () => {
+        //   alert("fasdf")
+        //   this.editor.getSession().setAnnotations([]);
+        // });
       },
 
       _setFatalities: function() {
@@ -67,8 +70,16 @@ Polymer({
         ace.editor.commands.addCommand({
           name: "run-code",
           bindKey: { win: "ctrl+enter", mac: "command+enter" },
-          exec: () => { this.runCode() }
+          exec: function() { this.runCode() }.bind(this)
         });
+      },
+
+      fixEditorHeight: function() {
+        const lineHeight = this.editor.renderer.lineHeight;
+        const availableLines = ($(document).height()) / this.editor.renderer.lineHeight;
+
+        this.editor.setOption("minLines", availableLines);
+        this.editor.setOption("maxLines", availableLines);
       }
 
     });
