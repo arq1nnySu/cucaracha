@@ -55,10 +55,11 @@ class Block{
 	}
 
 	toString(n){
-		var rep =  "(" + this.constructor.name + "\n" 
-		           + this.statements.map(s => s.toString(n+2)).join("\n")
-		           + ")"
-		return Indents.indent(rep, n+1)
+		var tab = n
+		var rep = "(" + this.constructor.name + "\n" 
+		           + this.statements.map(s => s.toString(tab)).join("\n") 
+		           + "\n)"
+		return Indents.indent(rep, tab)
 	}
 }
 
@@ -187,8 +188,12 @@ class ExprVar extends ASTType{
 		this.id = id
 	}
 	
-	toString(){
-		return this.id
+	toString(n){
+		var tab = n
+		var rep = "(" + this.constructor.name + "\n"   
+		           + Indents.indent(this.id, tab, 2) + "\n"
+		           + ")"
+		return Indents.indent(rep, tab)
 	}
 }
 class ExprVecDeref extends ASTType{
@@ -280,8 +285,13 @@ class StmtCall extends ASTType{
 		this.expresions = expresions
 	}
 
-	toString(){
-		return this.constructor.name + "(" + this.id + "(" + this.expresions + "))"
+	toString(n){
+		var tab = n
+		var rep = "(" + this.constructor.name + "\n" 
+		           + Indents.indent(this.id, tab, 2) + "\n"
+		           + this.expresions.map(s => s.toString(tab)).join("\n")
+		           + "\n)"
+		return Indents.indent(rep, tab)
 	}
 }
 
