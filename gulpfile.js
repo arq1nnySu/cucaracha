@@ -140,7 +140,7 @@ gulp.task('serve', ['default'], function() {
 
   gulp.watch(['src/**/*.html'], ['js', reload]);
   gulp.watch(['src/styles/**/*.css'], ['styles', reload]);
-  gulp.watch(['src/scripts/**/*.js'], reload);
+  gulp.watch(['src/**/*.js'], reload);
   gulp.watch(['src/images/**/*'], reload);
 });
 

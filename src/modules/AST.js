@@ -1,13 +1,15 @@
+import Indents from "../utils/Indents.js";
+
 class ASTType{
-	toString(){
-		return this.constructor.name + " "   
+	toString(n){
+		return Indents.indent(this.constructor.name.replace("Type", ""), n+1, 2)   
 	}
 }
 
-class IntType extends ASTType {}
-class BoolType extends ASTType {}
-class VecType extends ASTType {}
-class VoidType extends ASTType {}
+class IntType extends ASTType { }
+class BoolType extends ASTType { }
+class VecType extends ASTType { }
+class UnitType extends ASTType { }
 
 class ExprConstNum{
 	constructor(value){
@@ -33,14 +35,19 @@ class ExprConstBool{
 	}
 }
 
-class Program extends Array{
-	constructor(){
+class Program extends Array
+{	constructor(){
 		super()
 	}
 
 	add(param){
 		this.unshift(param)
 		return this
+	}
+
+	toString(){
+		return "(Program \n" + 
+		           this.map(f => f.toString(1)).join("\n") + "\n)"
 	}
 }
 
@@ -52,9 +59,24 @@ class Fun{
 		this.block = block
 	}
 
-	toString(){
-		return this.id + "(" + this.parameters +") :" 
-			+ this.type +"" + this.block
+
+
+	toStringParams(tab){
+		if (this.parameters.length != 0){ 
+			return Indents.indent(this.parameters, tab, 2) + "\n"
+		}
+		return ""
+	}
+
+	toString(n){
+		var tab = n+1
+		var rep =  "(Function \n" 
+		           + Indents.indent(this.id, tab+1, 2) + "\n" 
+		           + this.toStringParams(tab+1) 
+		           + this.type.toString(tab) + "\n" 
+		           + this.block.toString(tab) + "\n" 
+		           + ")"
+		return Indents.indent(rep, tab)
 	}
 }
 
@@ -63,8 +85,11 @@ class Block{
 		this.statements = statements;
 	}
 
-	toString(){
-		return "Block (" +this.statements.join(', ') + " )"
+	toString(n){
+		var rep =  "(" + this.constructor.name + "\n" 
+		           + this.statements.map(s => s.toString(n+2)).join("\n")
+		           + ")"
+		return Indents.indent(rep, n+1)
 	}
 }
 
@@ -309,7 +334,7 @@ window.VecType = VecType
 window.ExprVecLength = ExprVecLength
 window.ExprVecDeref = ExprVecDeref
 window.ExprVar = ExprVar
-window.VoidType = VoidType
+window.UnitType = UnitType
 window.Instructions = Instructions
 window.StmtAssign = StmtAssign
 window.Program = Program

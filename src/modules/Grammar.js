@@ -49,11 +49,11 @@ export default {
     },
 
     "operators": [
-        ["left", "TIMES", "DIV"], // mayor
+        ["left", "TIMES", "DIV"],
         ["left", "PLUS", "MINUS"],
         ["nonassoc", "LE", "GE", "LT", "GT", "EQ", "NE"],
         ["left", "NOT"],
-        ["left", "AND", "OR"]  // menor
+        ["left", "AND", "OR"] 
     ],
 
     "tokens": "BOOL, INT, VEC, TRUE, FALSE, AND, ELSE, FUN, IF, NOT, OR, RETURN, WHILE",
@@ -64,10 +64,10 @@ export default {
             ["programa EOF", "return $1"]
         ],
 
-        "programa": [ [ "", "$$ = new Program();" ], 
-                                [ "function programa", "$$ = $2.add($1);" ]],
+        "programa": [ [ "", "$$ = new Program();" ],
+                      [ "function programa", "$$ = $2.add($1);" ]],
 
-        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new VoidType(), $4, $6);" ],
+        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new UnitType(), $4, $6);" ],
                      [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo bloque", "$$ = new Fun($2, $7, $4, $8);" ]],
 
 
