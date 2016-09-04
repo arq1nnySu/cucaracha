@@ -1,4 +1,7 @@
-import Indents from "../utils/Indents.js";
+String.prototype.tab = function(n){
+	var tab = new Array(n+1).join('--')
+	return tab+this.split("\n").join("\n"+tab)
+}
 
 const ENTER = "\n"
 
@@ -10,27 +13,27 @@ class Serializer{
 
 	functionString(fun, level){
 		var rep =  "(Function "+ENTER 
-		           + Indents.indent(fun.id, level+1) + ENTER 
+		           + fun.id.tab(level+1) + ENTER 
 		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, level)).join(ENTER)+ENTER :"")
 		           + this.typeString(fun.type, level) + ENTER
 		           + this.blockString(fun.block, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, level+1)
+		return rep.tab(level+1)
 	}
 
 	paramString(param, level){
-		return Indents.indent(param.id+":"+param.type, level+1)	
+		return (param.id+":"+param.type).tab(level+1)
 	}
 
 	typeString(type, level){
-		return Indents.indent(type.toString(), level+1)	
+		return type.toString().tab(level+1)	
 	}
 
 	blockString(block, level){
 		var rep = "(" + block.constructor.name + ENTER 
 		           + block.statements.map(s => this.statementString(s,level)).join(ENTER) + ENTER
 		           + ")"
-		return Indents.indent(rep, level+1)
+		return rep.tab(level+1)
 	}
 
 	statementString(statement, level){
@@ -51,30 +54,30 @@ class Serializer{
         	case "StmtCall":
         		return this.callString(statement, level)
     		default:
-    		   return "INVALID"
+    		   return statement.toString().tab(level+1)
     	}
     }
 
     assignString(assign, level){
 		var rep = "(" + assign.constructor.name + ENTER 
-		           + Indents.indent(assign.id, level+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
+		           + assign.id.tab(level+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, level+1)
+		return rep.tab(level+1)
 	}
 
 	vecAssignString(vecAssign, level){
 		var rep = "(" + vecAssign.constructor.name + ENTER 
-		           + Indents.indent(vecAssign.id, level+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
+		           + vecAssign.id.tab(level+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
 		           + ")"
-		return Indents.indent(rep, level+1)
+		return rep.tab(level+1)
 	}
 
     callString(call, level){
 		var rep = "(" + call.constructor.name + ENTER
-		           + Indents.indent(call.id, level+1) + ENTER
+		           + call.id.tab(level+1) + ENTER
 		           + call.expresions.map(e => this.expresionString(e,level)).join(ENTER) + ENTER
 		           + ")"
-		return Indents.indent(rep, level+1)
+		return rep.tab(level+1)
 	}
 
 
@@ -96,18 +99,18 @@ class Serializer{
         	case "StmtCall":
         		return this.callString(expresion, level)
     		default:
-    		   return Indents.indent(expresion.toString(), level+1)
+    		   return expresion.toString().tab(level+1)
     	}
     }
 
     constString(constant, level){
     	var rep = constant.value + ENTER 
-    	return Indents.indent(rep, level+1)
+    	return rep.tab(level+1)
     }
 
     unaryString(unary, level){
     	var rep = unary.x + ENTER
-    	return Indents.indent(rep, level+1)
+    	return rep.tab(level+1)
     }
 }
 
