@@ -87,7 +87,11 @@ class Serializer{
 	}
 
 	returnString(returnst, level){
-		//return block.toString(level)
+		var tab = level
+		var rep = "(" + returnst.constructor.name + ENTER
+					  + this.expresionString(returnst.x, level) + ENTER
+					  + ")" 
+		return Indents.indent(rep, tab)
 	}
 
 	callString(call, level){
