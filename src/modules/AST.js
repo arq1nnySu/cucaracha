@@ -152,7 +152,7 @@ class ExprVecDeref extends ASTType{
 }
 
 class ExprVecMake extends ASTType{
-	constructor(expresion){
+	constructor(expresions){
 		super()
 		this.expresions = expresions
 	}
