@@ -248,5 +248,6 @@ window.ExprLe = ExprLe
 window.ExprGe = ExprGe
 window.ExprNe = ExprNe
 window.ExprVecMake = ExprVecMake
+window.ExprCall = ExprCall
 
 export default { }

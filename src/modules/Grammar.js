@@ -65,10 +65,15 @@ export default {
         ],
 
         "programa": [ [ "", "$$ = new Program();" ],
-                      [ "function programa", "$$ = $2.add($1);" ]],
+                      [ "declaracion_funcion programa", "$$ = $2.add($1);" ]],
 
-        "function": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new UnitType(), $4, $6);" ],
-                     [ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo bloque", "$$ = new Fun($2, $7, $4, $8);" ]],
+        "declaracion_funcion": [[ "funcion", "$$ = $1;" ],
+                                 [ "procedimiento", "$$ = $1;" ]],
+
+        "funcion": [[ "FUN ID LPAREN lista_paramametros RPAREN COLON tipo bloque", "$$ = new Fun($2, $7, $4, $8);" ]],
+
+
+        "procedimiento": [[ "FUN ID LPAREN lista_paramametros RPAREN bloque", "$$ = new Fun($2, new UnitType(), $4, $6);" ]],
 
 
         "tipo": [[ "INT", "$$ = new IntType();" ],
@@ -112,7 +117,7 @@ export default {
                                 ["LBRACK lista_expresiones RBRACK", "$$ = new ExprVecMake($2)"],
                                 ["HASH ID", "$$ = new ExprVecLength($2)"],
                                 ["ID LBRACK expresion RBRACK", "$$ = new ExprVecDeref($1, $3)"],
-                                ["ID LPAREN lista_expresiones RPAREN", "$$ = new ExprVecDeref($1, $3)"],
+                                ["ID LPAREN lista_expresiones RPAREN", "$$ = new ExprCall($1, $3)"],
                                 ["LPAREN expresion RPAREN", "$$ = $2"] ],
 
         "expresion_multiplicativa": [ ["expresion_multiplicativa TIMES expresion_atomica", "$$ = new ExprMul($1,$3)"],

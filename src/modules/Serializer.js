@@ -77,14 +77,16 @@ class Serializer{
 	}
 	
 	expBlockString(exp, level){
-		var rep = "(" + exp.constructor.name + "(" + ENTER +this.expresionString(exp.expresion, level) + ")" + ENTER
+		var rep = "(" + exp.constructor.name +  ENTER 
+				   +this.expresionString(exp.expresion, level)  + ENTER
 		           + this.blockString(exp.block, level)  + ENTER
 		           + ")"
 		return rep.tab(level+1)
 	}
 
 	ifElseString(ifElsest, level){
-		var rep = "(" + ifElsest.constructor.name + "(" + this.expresionString(ifElsest.expresion, level) + ")" + ENTER
+		var rep = "(" + ifElsest.constructor.name + ENTER 
+				   + this.expresionString(ifElsest.expresion, level)  + ENTER
 		           + this.blockString(ifElsest.block, level)  + ENTER
 		           + this.blockString(ifElsest.elseBlock, level)  + ENTER
 		           + ")"
@@ -202,7 +204,7 @@ class Serializer{
 
     expVecMakeString(expVecMake, level){
     	var rep = "(" + expVecMake.constructor.name + ENTER
-    				+ "[" + expVecMake.expresions.map(s => this.expresionString(s,level)).join(ENTER) + "]" + ENTER
+    				+ expVecMake.expresions.map(s => this.expresionString(s,level)).join(ENTER) + ENTER
     				+ ")"	
     	return rep.tab(level+1)	
     }
