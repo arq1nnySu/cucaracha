@@ -1,9 +1,13 @@
-String.prototype.tab = function(n){
+const ENTER = "\n"
+
+var tabFunction = function(n){
 	var tab = new Array(n+1).join('--')
-	return tab+this.split("\n").join("\n"+tab)
+	return tab+this.toString().split(ENTER).join(ENTER+tab)
 }
 
-const ENTER = "\n"
+String.prototype.tab = tabFunction
+Number.prototype.tab = tabFunction
+Boolean.prototype.tab = tabFunction
 
 class Serializer{
 
@@ -60,7 +64,7 @@ class Serializer{
 
     assignString(assign, level){
 		var rep = "(" + assign.constructor.name + ENTER 
-		           + assign.id.tab(level+1) + "=" + this.expresionString(assign.expresion, level) + ENTER
+		           + assign.id.tab(level+1) + ENTER + this.expresionString(assign.expresion, level) + ENTER
 		           + ")"
 		return rep.tab(level+1)
 	}
@@ -124,7 +128,8 @@ class Serializer{
     }
 
     constString(constant, level){
-    	var rep = constant.value + ENTER 
+    	var rep = "("+constant.constructor.name  + ENTER  +
+    				constant.value.tab(level+1) + ENTER + ")"
     	return rep.tab(level+1)
     }
 
