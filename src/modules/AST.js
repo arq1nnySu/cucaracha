@@ -59,7 +59,7 @@ class Block{
 		var rep = "(" + this.constructor.name + "\n" 
 		           + this.statements.map(s => s.toString(tab)).join("\n") 
 		           + "\n)"
-		return Indents.indent(rep, tab)
+		return Indents.indent(rep, tab+1)
 	}
 }
 
@@ -318,6 +318,7 @@ window.Instructions = Instructions
 window.StmtAssign = StmtAssign
 window.Program = Program
 window.StmtIf = StmtIf
+window.StmtIfElse = StmtIfElse
 window.StmtCall = StmtCall
 window.ExprLt = ExprLt
 window.ExprNot = ExprNot
