@@ -10,9 +10,9 @@
         mode="ace/mode/cucaracha"
         theme="ace/theme/chrome"
         font-size="18"
-        tab-size="4"
-        minlines="12"
-        maxlines="12"
+        tab-size="2"
+        minlines="30"
+        maxlines="50"
         initial-focus
     >
 fun main() { 
@@ -25,8 +25,8 @@ fun main() {
 
     </ace-widget>
     <div class="result_container">
-        <div><input type="button"  value="Parsear" on-click="runCode"></input></div>
-        <div><textarea class="result_code" id="result"></textarea></div>
+        <div><input type="button"  value="Parsear" on-click="runCode" ></input></div>
+        <div><textarea class="result_code" id="result" disabled></textarea></div>
     </div>
     
   </template>
