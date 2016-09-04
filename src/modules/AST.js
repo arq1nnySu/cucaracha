@@ -121,10 +121,10 @@ class Assign extends BinaryExpr{}
 class ExprNot  extends UnaryExpr{}
 
 class ExprCall extends ASTType{
-	constructor(id, expressions){
+	constructor(id, expresions){
 		super()
 		this.id = id
-		this.expresions = expresion
+		this.expresions = expresions
 	}
 }
 
