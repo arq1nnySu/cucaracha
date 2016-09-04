@@ -43,11 +43,11 @@ class Serializer{
     		case "StmtVecAssign":
     			return this.vecAssignString(statement, level)
         	case "StmtIf":
-        		return this.ifString(statement, level)
+        		return this.expBlockString(statement, level)
         	case "StmtIfElse":
         		return this.ifElseString(statement, level)
     		case "StmtWhile":
-    			return this.whileString(statement, level)
+    			return this.expBlockString(statement, level)
     		case "StmtReturn":
     			return this.returnString(statement, level)
         	case "StmtCall":
@@ -72,8 +72,29 @@ class Serializer{
 		           + ")"
 		return Indents.indent(rep, tab+1)
 	}
+	
+	expBlockString(exp, level){
+		var tab = level
+		var rep = "(" + exp.constructor.name + "(" + this.expresionString(exp.expresion, level) + ")" + ENTER
+		           + this.blockString(exp.block, level)  + ENTER
+		           + ")"
+		return Indents.indent(rep, tab)
+	}
 
-    callString(call, level){
+	ifElseString(ifElsest, level){
+		var tab = level
+		var rep = "(" + ifElsest.constructor.name + "(" + this.expresionString(ifElsest.expresion, level) + ")" + ENTER
+		           + this.blockString(ifElsest.block, level)  + ENTER
+		           + this.blockString(ifElsest.elseBlock, level)  + ENTER
+		           + ")"
+		return Indents.indent(rep, tab)
+	}
+
+	returnString(returnst, level){
+		//return block.toString(level)
+	}
+
+	callString(call, level){
 		var tab = level
 		var rep = "(" + call.constructor.name + ENTER
 		           + Indents.indent(call.id, tab) + ENTER
@@ -81,7 +102,6 @@ class Serializer{
 		           + ")"
 		return Indents.indent(rep, tab)
 	}
-
 
 	expresionString(expresion, level){
 		var ename = expresion.constructor.name
