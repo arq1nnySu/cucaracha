@@ -21,7 +21,7 @@ export default {
 	  //       return tabs.replace(/./g, numOfIndents);
 	  //   })
 	  //   : str;
-	  var tab = new Array(numOfIndents+1).join(' ')
+	  var tab = new Array(numOfIndents+1).join('--')
 	  return tab+str.split("\n").join("\n"+tab)
 	}
 }

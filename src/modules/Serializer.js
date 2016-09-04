@@ -5,16 +5,16 @@ const ENTER = "\n"
 class Serializer{
 
 	serialize(program){
-		return "(Program "+ ENTER + program.map(f => this.functionString(f, 1)).join(ENTER) + ENTER+")"
+		return "(Program "+ ENTER + program.map(f => this.functionString(f, 0)).join(ENTER) + ENTER+")"
 	}
 
 	functionString(fun, level){
 		var tab = level+1
 		var rep =  "(Function "+ENTER 
-		           + Indents.indent(fun.id, tab+1) + ENTER 
-		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, tab)).join(ENTER)+ENTER :"")
-		           + this.typeString(fun.type, tab) + ENTER
-		           + this.blockStirng(fun.block, tab) + ENTER
+		           + Indents.indent(fun.id, tab) + ENTER 
+		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, level)).join(ENTER)+ENTER :"")
+		           + this.typeString(fun.type, level) + ENTER
+		           + this.blockStirng(fun.block, level) + ENTER
 		           + ")"
 		return Indents.indent(rep, tab)
 	}
