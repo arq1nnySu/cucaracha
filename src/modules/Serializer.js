@@ -161,7 +161,7 @@ class Serializer{
     expVarString(expVar, level){
     	var rep = "(" + expVar.constructor.name + ENTER
     			   + expVar.id.tab(level+1) + ENTER
-    			   ")"
+    			   + ")"
     	return rep.tab(level+1)	
     }
 
