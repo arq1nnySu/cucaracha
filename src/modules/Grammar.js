@@ -109,7 +109,7 @@ export default {
                                 ["NUM", "$$ = new ExprConstNum(yytext)"],
                                 ["TRUE", "$$ = new ExprConstBool(true)"],
                                 ["FALSE", "$$ = new ExprConstBool(false)"],
-                                ["LBRACK lista_expresiones RBRACK", "$$ = new ExprVecLength($2)"],
+                                ["LBRACK lista_expresiones RBRACK", "$$ = new ExprVecMake($2)"],
                                 ["HASH ID", "$$ = new ExprVecLength($2)"],
                                 ["ID LBRACK expresion RBRACK", "$$ = new ExprVecDeref($1, $3)"],
                                 ["ID LPAREN lista_expresiones RPAREN", "$$ = new ExprVecDeref($1, $3)"],

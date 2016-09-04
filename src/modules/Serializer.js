@@ -77,7 +77,7 @@ class Serializer{
 	}
 	
 	expBlockString(exp, level){
-		var rep = "(" + exp.constructor.name + "(" + this.expresionString(exp.expresion, level) + ")" + ENTER
+		var rep = "(" + exp.constructor.name + "(" + ENTER +this.expresionString(exp.expresion, level) + ")" + ENTER
 		           + this.blockString(exp.block, level)  + ENTER
 		           + ")"
 		return rep.tab(level+1)
@@ -118,7 +118,7 @@ class Serializer{
         	case "ExprVecMake":
         		return "INVALID"
 			case "ExprVecLength":
-        		return "INVALID"
+        		return this.expVecLengthString(expresion, level)
         	case "ExprVecDeref":
         		return this.expVecDerefString(expresion, level)
         	case "ExprCall":
@@ -174,6 +174,13 @@ class Serializer{
     	var rep = "(" + expVecD.constructor.name + ENTER
     				+ expVecD.id.tab(level+1) + ENTER
     				+ this.expresionString(expVecD.expresion, level) + ENTER
+    				+ ")"	
+    	return rep.tab(level+1)
+    }
+
+    expVecLengthString(expVecL, level){
+    	var rep = "(" + expVecL.constructor.name + ENTER
+    				+ expVecL.id.tab(level+1) + ENTER
     				+ ")"	
     	return rep.tab(level+1)
     }

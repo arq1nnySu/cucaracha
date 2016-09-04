@@ -247,5 +247,6 @@ window.StmtWhile = StmtWhile
 window.ExprLe = ExprLe
 window.ExprGe = ExprGe
 window.ExprNe = ExprNe
+window.ExprVecMake = ExprVecMake
 
 export default { }
