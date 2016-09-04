@@ -86,7 +86,7 @@ gulp.task('ensureFiles', function(cb) {
 
 
 gulp.task('build', function () {
-  browserify({
+  var index = browserify({
     entries: ['./src/index.js'],
     debug: true
   })
@@ -95,6 +95,16 @@ gulp.task('build', function () {
     .pipe(source('output.js'))
     .pipe(gulp.dest(dist()))
     .pipe(browserSync.reload({stream: true}));
+
+    // var elements = browserify({
+    //   entries: ['./src/elements/elements.js'],
+    //   debug: true
+    // })
+    // .transform(babelify)
+    // .bundle()
+    // .pipe(source('elements.js'))
+    // .pipe(gulp.dest(dist("elements")))
+    // .pipe(browserSync.reload({stream: true}));
 });
 
 // Transpile all JS to ES5.
@@ -110,7 +120,7 @@ gulp.task('js', function() {
 });
 
 gulp.task('copy', function () {
-  var app = gulp.src([
+  return gulp.src([
     'src/index.html',
     '!src/elements',
     '!src/bower_components',
@@ -118,13 +128,12 @@ gulp.task('copy', function () {
   ], {
       dot: true
     }).pipe(gulp.dest(dist()))
+});
 
-    var bower = gulp.src([
-      'bower_components/**/*'
-    ]).pipe(gulp.dest(dist('bower_components')));
-
-    return merge(app, bower)
-    .pipe(browserSync.reload({stream: true}));
+gulp.task('copyBower', function () {
+  return gulp.src([
+    'bower_components/**/*'
+  ]).pipe(gulp.dest(dist('bower_components')));
 });
 
 // Watch files for changes & reload
@@ -150,9 +159,9 @@ gulp.task('serve', ['default'], function() {
     }
   });
 
-  gulp.watch(['src/**/*.html'], ['js', reload]);
-  gulp.watch(['src/styles/**/*.css'], ['styles', reload]);
-  gulp.watch(['src/**/*.js'], reload);
+  gulp.watch(['src/**/*.html'], ['copy', 'vulcanize']);
+  gulp.watch(['src/styles/**/*.css'], ['styles']);
+  gulp.watch(['src/**/*.js'], ['build']);
   gulp.watch(['src/images/**/*'], reload);
 });
 
@@ -227,7 +236,7 @@ gulp.task('clean', function() {
 gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
-    ['copy', 'styles'],
+    ['copy', 'copyBower', 'styles'],
     ['html'],
     'build',
     // 'js',
