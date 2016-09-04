@@ -12,32 +12,32 @@ Boolean.prototype.tab = tabFunction
 class Serializer{
 
 	serialize(program){
-		return "(Program "+ ENTER + program.map(f => this.functionString(f, 0)).join(ENTER) + ENTER+")"
+		return "(Program "+ ENTER + program.map(f => this.functionString(f, 0)).join("") +")"
 	}
 
 	functionString(fun, level){
 		var rep =  "(Function "+ENTER 
 		           + fun.id.tab(level+1) + ENTER 
-		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, level)).join(ENTER)+ENTER :"")
-		           + this.typeString(fun.type, level) + ENTER
-		           + this.blockString(fun.block, level) + ENTER
+		           + (fun.parameters.length>0? fun.parameters.map(p => this.paramString(p, level)).join("") :"")
+		           + this.typeString(fun.type, level)
+		           + this.blockString(fun.block, level)
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1)+ENTER
 	}
 
 	paramString(param, level){
-		return (param.id+":"+param.type).tab(level+1)
+		return (param.id+":"+param.type).tab(level+1)+ENTER
 	}
 
 	typeString(type, level){
-		return type.toString().tab(level+1)	
+		return type.toString().tab(level+1)	+ENTER
 	}
 
 	blockString(block, level){
 		var rep = "(" + block.constructor.name + ENTER 
-		           + block.statements.map(s => this.statementString(s,level)).join(ENTER) + ENTER
+		           + block.statements.map(s => this.statementString(s,level)).join('') 
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1)+ENTER
 	}
 
 	statementString(statement, level){
@@ -64,48 +64,50 @@ class Serializer{
 
     assignString(assign, level){
 		var rep = "(" + assign.constructor.name + ENTER 
-		           + assign.id.tab(level+1) + ENTER + this.expresionString(assign.expresion, level) + ENTER
+		           + assign.id.tab(level+1) + ENTER + this.expresionString(assign.expresion, level)
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 
 	vecAssignString(vecAssign, level){
 		var rep = "(" + vecAssign.constructor.name + ENTER 
-		           + vecAssign.id.tab(level+1) + "[" + this.expresionString(vecAssign.x, level) + "] =" + this.expresionString(vecAssign.y, level) + ENTER
+		           + vecAssign.id.tab(level+1) + ENTER 
+		           + this.expresionString(vecAssign.x, level) 
+		           + this.expresionString(vecAssign.y, level) 
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 	
 	expBlockString(exp, level){
 		var rep = "(" + exp.constructor.name +  ENTER 
-				   +this.expresionString(exp.expresion, level)  + ENTER
-		           + this.blockString(exp.block, level)  + ENTER
+				   +this.expresionString(exp.expresion, level) 
+		           + this.blockString(exp.block, level)
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 
 	ifElseString(ifElsest, level){
 		var rep = "(" + ifElsest.constructor.name + ENTER 
-				   + this.expresionString(ifElsest.expresion, level)  + ENTER
-		           + this.blockString(ifElsest.block, level)  + ENTER
-		           + this.blockString(ifElsest.elseBlock, level)  + ENTER
+				   + this.expresionString(ifElsest.expresion, level)
+		           + this.blockString(ifElsest.block, level)
+		           + this.blockString(ifElsest.elseBlock, level)
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 
 	returnString(returnst, level){
 		var rep = "(" + returnst.constructor.name + ENTER
-					  + this.expresionString(returnst.x, level) + ENTER
+					  + this.expresionString(returnst.x, level)
 					  + ")" 
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 
 	callString(call, level){
 		var rep = "(" + call.constructor.name + ENTER
 		           + call.id.tab(level+1) + ENTER
-		           + call.expresions.map(e => this.expresionString(e,level)).join(ENTER) + ENTER
+		           + call.expresions.map(e => this.expresionString(e,level)).join('')
 		           + ")"
-		return rep.tab(level+1)
+		return rep.tab(level+1) + ENTER
 	}
 
 	expresionString(expresion, level){
@@ -157,64 +159,63 @@ class Serializer{
     constString(constant, level){
     	var rep = "("+constant.constructor.name  + ENTER  +
     				constant.value.tab(level+1) + ENTER + ")"
-    	return rep.tab(level+1)
+    	return rep.tab(level+1) + ENTER
     }
 
     unaryString(unary, level){
-    	var rep = unary.x + ENTER
-    	return rep.tab(level+1)
+    	return unary.x.tab(level+1) + ENTER
     }
 
     expVarString(expVar, level){
     	var rep = "(" + expVar.constructor.name + ENTER
     			   + expVar.id.tab(level+1) + ENTER
     			   + ")"
-    	return rep.tab(level+1)	
+    	return rep.tab(level+1)	+ ENTER
     }
 
     expVecDerefString(expVecD, level){
     	var rep = "(" + expVecD.constructor.name + ENTER
     				+ expVecD.id.tab(level+1) + ENTER
-    				+ this.expresionString(expVecD.expresion, level) + ENTER
+    				+ this.expresionString(expVecD.expresion, level) 
     				+ ")"	
-    	return rep.tab(level+1)
+    	return rep.tab(level+1) + ENTER
     }
 
     expVecLengthString(expVecL, level){
     	var rep = "(" + expVecL.constructor.name + ENTER
     				+ expVecL.id.tab(level+1) + ENTER
     				+ ")"	
-    	return rep.tab(level+1)
+    	return rep.tab(level+1) + ENTER
     }
 
     binaryExpString(binary, level){
     	var rep = "(" + binary.constructor.name + ENTER
-    				+ this.expresionString(binary.x, level) + ENTER
-    				+ this.expresionString(binary.y, level) + ENTER
+    				+ this.expresionString(binary.x, level)
+    				+ this.expresionString(binary.y, level)
     				+ ")"	
-    	return rep.tab(level+1)
+    	return rep.tab(level+1) + ENTER
     }
 
     notExpString(nots, level){
     	var rep = "(" + nots.constructor.name + ENTER
-    				+ this.expresionString(nots.x, level) + ENTER
+    				+ this.expresionString(nots.x, level)
     				+ ")"	
-    	return rep.tab(level+1)	
+    	return rep.tab(level+1)	+ ENTER
     }
 
     expVecMakeString(expVecMake, level){
     	var rep = "(" + expVecMake.constructor.name + ENTER
-    				+ expVecMake.expresions.map(s => this.expresionString(s,level)).join(ENTER) + ENTER
+    				+ expVecMake.expresions.map(s => this.expresionString(s,level)).join('') 
     				+ ")"	
-    	return rep.tab(level+1)	
+    	return rep.tab(level+1)	+ ENTER
     }
 
     expCallString(expCall, level){
     	var rep = "(" + expCall.constructor.name + ENTER
     				+ expCall.id.tab(level+1) + ENTER 
-    				+ expCall.expresions.map(s => this.expresionString(s,level)).join(ENTER) + ENTER
+    				+ expCall.expresions.map(s => this.expresionString(s,level)).join('') 
     				+ ")"	
-    	return rep.tab(level+1)	
+    	return rep.tab(level+1)	+ ENTER
     }
 }
 
