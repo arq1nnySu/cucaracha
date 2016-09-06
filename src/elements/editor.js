@@ -13,6 +13,7 @@ Polymer({
         this._subscribeToChangeEvents();
         setTimeout(function() { this.fixEditorHeight(); }.bind(this), 500);
         $(window).resize(function() { this.fixEditorHeight(); }.bind(this));
+
       },
 
       onAceReady: function() {
@@ -53,7 +54,7 @@ Polymer({
         this.editor.getSession().setAnnotations([{
           row: err.line,
           column: err.loc.first_column,
-          text: "Error en la linea "+ err.line + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
+          text: "Error en la linea "+ (err.line+1) + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
           type: 'error'
         }]);
       },
