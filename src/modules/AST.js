@@ -1,6 +1,23 @@
-class ASTNode{
+class Location{
+	constructor(first_line, last_line, first_column, last_column){
+		this.first_line = first_line
+		this.last_line = last_line
+		this.first_column = first_column
+		this.last_column = last_column
+	}
+
 	toString(){
-		return this.constructor.name
+		return JSON.stringify(this)
+	}
+}
+
+class ASTNode{
+	constructor(location){
+		this.location = location
+	}
+
+	toString(){
+		return this.constructor.name 
 	}
 }
 
@@ -28,6 +45,10 @@ class Arrays extends Array{
 		this.unshift(param)
 		return this
 	}
+
+	toString(){
+		return this.constructor.name
+	}
 }
 
 class Program extends Arrays{	
@@ -40,24 +61,31 @@ class Program extends Arrays{
 	}
 }
 
-class Fun{
-	constructor(id, type, parameters, block){
+class Fun extends ASTNode{
+	constructor(id, type, parameters, block, location){
+		super(location)
 		this.id = id
 		this.type = type
 		this.parameters = parameters
 		this.block = block
 	}
+
+	toString(){
+		return "Function"
+	}
 }
 
-class Block{
-	constructor(statements){
+class Block extends ASTNode{
+	constructor(statements, location){
+		super(location)
 		this.statements = statements;
 	}	
 }
 
 
-class Parameter{
-	constructor(id, type){
+class Parameter extends ASTNode{
+	constructor(id, type, location){
+		super(location)
 		this.id = id;
 		this.type = type
 	}
@@ -65,8 +93,8 @@ class Parameter{
 
 //Expresiones
 class ExprValue extends ASTNode {
-	constructor(value){
-		super()
+	constructor(value, location){
+		super(location)
 		this.value = value
 	}
 }
@@ -79,8 +107,8 @@ class ExprVecLength  extends ExprValue{}
 
 //Exp Unarias
 class UnaryExpr extends ASTNode{
-	constructor(expresion){
-		super()
+	constructor(expresion, location){
+		super(location)
 		this.expresion = expresion;
 	}
 }
@@ -90,8 +118,8 @@ class StmtReturn extends UnaryExpr{}
 
 //Exp Binarias
 class BinaryExpr extends UnaryExpr{
-	constructor(expresion, secExpresion){
-		super(expresion)
+	constructor(expresion, secExpresion, location){
+		super(expresion, location)
 		this.secondExpresion = secExpresion;
 	}
 }
@@ -110,16 +138,16 @@ class ExprGt extends BinaryExpr{}
 class Div extends BinaryExpr{}
 class Assign extends BinaryExpr{}
 class StmtVecAssign  extends BinaryExpr{
-	constructor(id, x, y){
-		super(x, y)
+	constructor(id, expr1, expr2, location){
+		super(expr1, expr2, location)
 		this.id = id
 	}
 }
 
 //Exp Con id y expresiones
 class ASTNodeIdAndExpresions extends ASTNode{
-	constructor(id, expresions){
-		super()
+	constructor(id, expresions, location){
+		super(location)
 		this.id = id
 		this.expresions = expresions
 	}
@@ -130,15 +158,15 @@ class ExprCall extends ASTNodeIdAndExpresions{}
 
 
 class ExprVecMake extends ASTNode{
-	constructor(expresions){
-		super()
+	constructor(expresions, location){
+		super(location)
 		this.expresions = expresions
 	}
 }
 
 class ASTNodeIdAndExpresion extends ASTNode{
-	constructor(id, expresion){
-		super()
+	constructor(id, expresion, location){
+		super(location)
 		this.id = id
 		this.expresion = expresion
 	}
@@ -150,8 +178,8 @@ class StmtAssign extends ASTNodeIdAndExpresion{
 class ExprVecDeref extends ASTNodeIdAndExpresion{}
 
 class StmtExpresionBlock extends ASTNode{
-	constructor(expresion, block){
-		super()
+	constructor(expresion, block, location){
+		super(location)
 		this.expresion = expresion
 		this.block = block
 	}
@@ -160,8 +188,8 @@ class StmtExpresionBlock extends ASTNode{
 class StmtWhile extends StmtExpresionBlock{}
 class StmtIf extends StmtExpresionBlock{}
 class StmtIfElse extends StmtIf{
-	constructor(expresion, block, elseBlock){
-		super(expresion, block)
+	constructor(expresion, block, elseBlock, location){
+		super(expresion, block, location)
 		this.elseBlock = elseBlock
 	}
 }
@@ -212,5 +240,6 @@ window.ExprNe = ExprNe
 window.ExprVecMake = ExprVecMake
 window.ExprCall = ExprCall
 window.ASTNodeIdAndExpresion = ASTNodeIdAndExpresion
+window.Location = Location
 
 export default { }

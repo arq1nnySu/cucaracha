@@ -43,7 +43,7 @@ Polymer({
           return parser.parse(sourceCode)
         } catch (err) {
           this.reportError(err.hash)
-          return e;
+          return err;
         }
       },
       

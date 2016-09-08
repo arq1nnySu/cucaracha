@@ -3,8 +3,8 @@ import AST from './AST';
 const ENTER = "\n"
 
 var tabFunction = function(){
-	var tab = new Array(2).join('--')
-	return tab+this.toString().split(ENTER).join(ENTER+tab)+ENTER
+	var tab = new Array(2).join('  ')
+	return tab+this.toString().trim().split(ENTER).join(ENTER+tab)+ENTER
 }
 
 String.prototype.tab = tabFunction
@@ -20,21 +20,25 @@ Arrays.prototype.serializeElements = function(){
 }
 
 Program.prototype.serialize = function(){
-	return "(Program "+ ENTER + this.serializeElements() +")"
+	return "(" + this + ENTER + this.serializeElements() +")"
 } 
 
 Fun.prototype.serialize = function(){
-	var rep = "(Function " + ENTER 
+	var rep = "(" + this + ENTER 
 	   + this.id.tab()
-	   + this.parameters.serializeElements()
 	   + this.type.serialize()
+	   + this.parameters.serializeElements()
 	   + this.block.serialize()
 	   + ")"
 	return rep.tab()
 }
 
 Parameter.prototype.serialize = function(){
-	return (this.id+":"+this.type).tab()
+	var rep = "(" + this + ENTER 
+	           + this.id.tab()
+	           + this.type.serialize()
+	           + ")"
+	return rep.tab()
 }
 
 ASTType.prototype.serialize = function(){
@@ -42,7 +46,7 @@ ASTType.prototype.serialize = function(){
 }
 
 Block.prototype.serialize = function(){
-	var rep = "(Block"  + ENTER 
+	var rep = "(" + this  + ENTER 
 	           + this.statements.serializeElements()
 	           + ")"
 	return rep.tab()
