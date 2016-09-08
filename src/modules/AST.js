@@ -59,6 +59,11 @@ class Program extends Arrays{
 	serialize(){
 		return Serializer.serialize(this)
 	}
+
+	semanticize(){
+		return SemanticAnalysis.semanticize(this)
+	}
+
 }
 
 class Fun extends ASTNode{

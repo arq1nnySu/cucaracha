@@ -30,6 +30,7 @@ Polymer({
         const sourceCode = this.editor.getValue();
         var ast = this.parse(sourceCode)
         
+        var table = ast.semanticize()
         if (ast.error) {
           $("#result").html(err.message)
           return
