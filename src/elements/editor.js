@@ -30,10 +30,14 @@ Polymer({
         const sourceCode = this.editor.getValue();
         var ast = this.parse(sourceCode)
         
-        var table = ast.semanticize()
         if (ast.error) {
           $("#result").html(err.message)
-          return
+        }
+
+        try{
+          var table = ast.semanticize()
+        }catch(err){
+          this.reportSemanticError(err)
         }
 
         $("#result").html(ast.serialize())
@@ -53,9 +57,18 @@ Polymer({
 
       reportError: function(err) {
         this.editor.getSession().setAnnotations([{
-          row: err.line,
+          row: err.loc.first_line,
           column: err.loc.first_column,
-          text: "Error en la linea "+ (err.line+1) + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
+          text: "Error en la linea "+ (err.loc.first_line+1) + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
+          type: 'error'
+        }]);
+      },
+
+      reportSemanticError: function(err) {
+        this.editor.getSession().setAnnotations([{
+          row: err.loc.first_line-1,
+          column: err.loc.first_column,
+          text: err.message,
           type: 'error'
         }]);
       },

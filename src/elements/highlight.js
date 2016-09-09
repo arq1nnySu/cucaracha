@@ -8,7 +8,7 @@ var TextHighlightRules = ace.require("ace/mode/text_highlight_rules").TextHighli
 var CucarachaHighlightRules = function() {
 
     var keywords = (
-    "Bool|Int|Vec|True|False|and|else|fun|if|not|or|return|while"
+    "Bool|Int|Vec|Unit|True|False|and|else|fun|if|not|or|return|while"
     );
 
     var buildinConstants = (

@@ -52,8 +52,10 @@ class Arrays extends Array{
 }
 
 class Program extends Arrays{	
-	constructor(){
+	constructor(location){
 		super()
+		this.location = location
+
 	}
 
 	serialize(){

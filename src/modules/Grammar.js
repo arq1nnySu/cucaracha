@@ -83,7 +83,7 @@ export default {
             ["programa EOF", "return $1"]
         ],
 
-        "programa": [ [ "", "$$ = new Program();" ],
+        "programa": [ [ "", "$$ = new Program(new Location(@1.first_line , @1.last_line, @1.first_column, @1.last_column));" ],
                       [ "declaracion_funcion programa", "$$ = $2.add($1);" ]],
 
         "declaracion_funcion": [[ "funcion", "$$ = $1;" ],
