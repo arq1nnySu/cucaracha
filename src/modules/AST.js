@@ -27,12 +27,20 @@ class ASTType extends ASTNode{
 	toString(){
 		return this.constructor.name.replace("Type", "")
 	}
+
+	isVoid(){
+		return false
+	}
 }
 
 class IntType extends ASTType { }
 class BoolType extends ASTType { }
 class VecType extends ASTType { }
-class UnitType extends ASTType { }
+class UnitType extends ASTType { 
+	isVoid(){
+		return true
+	}
+}
 
 
 class Arrays extends Array{
@@ -79,6 +87,10 @@ class Fun extends ASTNode{
 
 	toString(){
 		return "Function"
+	}
+
+	idVoid(){
+		return this.type.isVoid()
 	}
 }
 
