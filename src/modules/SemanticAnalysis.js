@@ -15,10 +15,19 @@ Arrays.prototype.semanticizeElements = function(){
 	}
 }
 
+Program.prototype.initTable = function(){ 
+	var typer = new UnitType().toString()
+	var typep = new IntType().toString()
+	var location = new Location(0,0,0,0)
+	var param = new Parameter("x", typep, location)
+	var block = new Block([], location)
+	var char = new Fun("putChar", typer, [param], block, location)
+	var num = new Fun("putNum", typer, [param], block, location)
+	return {char, num}
+}
 Program.prototype.semanticize = function(){
-	var char = new Fun("putChar", new UnitType().serialize(), [new Parameter("v", new IntType())], "")
-	var num = new Fun("putNum", new UnitType().serialize(), [new Parameter("v", new IntType())], "")
-	var functionTable = {char, num}
+	
+	var functionTable = this.initTable()
 
 	this.forEach(fun =>{
 		if(functionTable[fun.id]){
