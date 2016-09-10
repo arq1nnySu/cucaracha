@@ -16,8 +16,8 @@ Arrays.prototype.semanticizeElements = function(){
 }
 
 Program.prototype.semanticize = function(){
-	var char = new Fun("putChar", new UnitType().serialize(), [new Parameter("v", new IntType())], "")
-	var num = new Fun("putNum", new UnitType().serialize(), [new Parameter("v", new IntType())], "")
+	var char = new Fun("putChar", new UnitType(), [new Parameter("v", new IntType())], "")
+	var num = new Fun("putNum", new UnitType(), [new Parameter("v", new IntType())], "")
 	var functionTable = {char, num}
 
 	this.forEach(fun =>{
@@ -29,13 +29,16 @@ Program.prototype.semanticize = function(){
 		}
 		functionTable[fun.id] = fun
 	})
-	if (!functionTable.hasOwnProperty("main")){
+
+	var mainFunction = functionTable["main"]
+
+	if (!mainFunction){
 		throw new SemanticError("Se tiene que definir una funcion con el nombre 'main'", this.location)
 	}
-	if(functionTable["main"].parameters.length>0){
+	if(mainFunction.parameters.length>0){
 		throw new SemanticError("La funcion 'main' se tiene que definir, sin parametros", functionTable["main"].location)
 	}
-	if(functionTable["main"].type.serialize() != "Unit"){
+	if(!mainFunction.isVoid()){
 		throw new SemanticError("La funcion 'main' se tiene que definir con el tipo Unit", functionTable["main"].location)	
 	}
 } 	

@@ -34,11 +34,7 @@ Polymer({
           $("#result").html(err.message)
         }
 
-        try{
-          var table = ast.semanticize()
-        }catch(err){
-          this.reportSemanticError(err)
-        }
+        this.compile(ast)
 
         $("#result").html(ast.serialize())
       },
@@ -51,15 +47,23 @@ Polymer({
           return err;
         }
       },
+
+      compile: function(ast) {
+        try{
+          ast.semanticize()
+        }catch(err){
+          this.reportSemanticError(err)
+        }
+      },
       
       interpret: function(ast, initialState) {
       },
 
       reportError: function(err) {
         this.editor.getSession().setAnnotations([{
-          row: err.loc.first_line,
+          row: err.loc.first_line-1,
           column: err.loc.first_column,
-          text: "Error en la linea "+ (err.loc.first_line+1) + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
+          text: "Error en la linea "+ (err.loc.first_line) + ". Se esperaba " +err.expected + " y se obtuvo " + err.text,
           type: 'error'
         }]);
       },
@@ -69,7 +73,7 @@ Polymer({
           row: err.loc.first_line-1,
           column: err.loc.first_column,
           text: err.message,
-          type: 'error'
+          type: 'warning'
         }]);
       },
 
