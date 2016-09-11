@@ -89,7 +89,7 @@ class Fun extends ASTNode{
 		return "Function"
 	}
 
-	idVoid(){
+	isVoid(){
 		return this.type.isVoid()
 	}
 }
@@ -119,10 +119,23 @@ class ExprValue extends ASTNode {
 }
 
 
-class ExprConstNum extends ExprValue{}
-class ExprConstBool extends ExprValue{}
+class ExprConstNum extends ExprValue{
+	getType(){
+		return new IntType()
+	}
+}
+class ExprConstBool extends ExprValue{
+	getType(){
+		return new BoolType()
+	}
+}
+class ExprVecLength  extends ExprValue{
+	getType(){
+		return new IntType()
+	}
+}
 class ExprVar extends ExprValue{}
-class ExprVecLength  extends ExprValue{}
+
 
 //Exp Unarias
 class UnaryExpr extends ASTNode{

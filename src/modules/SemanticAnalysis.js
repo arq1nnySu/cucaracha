@@ -15,9 +15,17 @@ Arrays.prototype.semanticizeElements = function(){
 	}
 }
 
+Program.prototype.initvarLocalTable = function(parameters){ 
+	var table = {}
+	parameters.forEach(param => {
+		table[param.id] = param
+	})
+	return table
+}
+
 Program.prototype.initTable = function(){ 
-	var typer = new UnitType().toString()
-	var typep = new IntType().toString()
+	var typer = new UnitType()
+	var typep = new IntType()
 	var location = new Location(0,0,0,0)
 	var param = new Parameter("x", typep, location)
 	var block = new Block([], location)
@@ -25,6 +33,7 @@ Program.prototype.initTable = function(){
 	var num = new Fun("putNum", typer, [param], block, location)
 	return {char, num}
 }
+
 Program.prototype.semanticize = function(){
 	var functionTable = this.initTable()
 
@@ -49,31 +58,23 @@ Program.prototype.semanticize = function(){
 	if(!mainFunction.isVoid()){
 		throw new SemanticError("La funcion 'main' se tiene que definir con el tipo Unit", functionTable["main"].location)	
 	}
+	_.values(functionTable).forEach(fun => {
+		var varLocalTable = this.initvarLocalTable(fun.parameters)
+		fun.block.statements.forEach(stats => {
+
+			if(stats instanceof StmtAssign){
+				if (!varLocalTable[stats.id]){
+					varLocalTable[stats.id] = stats
+				}else{
+					var varlocal = varLocalTable[stats.id]
+					var gtype = stats.expresion.getType() 
+					if ( gtype != varlocal.type){
+						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + "pero se obtuvo: " + gtype , stats.location)							
+					} 
+				}
+			}	
+		})
+	})
 } 	
-
-Fun.prototype.semanticize = function(){
-	return this.semanticizeFun()
-}
-
-Fun.prototype.semanticizeFun = function(){
-	var id = this.id.toString()
-	var params = this.parameters.semanticizeElements()
-	return { id : { "parameters" : params, 
-					"localvar": this.block.semanticizeBlock(params),
-					"rtype": this.type.serialize()}} 
-}
-
-Parameter.prototype.semanticize = function(){
-	var id = this.id.toString()
-	return { id : this.type.serialize()}
-}
-
-ASTType.prototype.serialize = function(){
-	return this.toString()
-}
-
-Block.prototype.semanticizeBlock = function(params){
-	 return params
-}
 
 export default {}
