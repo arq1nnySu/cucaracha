@@ -178,6 +178,9 @@ class StmtVecAssign  extends BinaryExpr{
 		super(expr1, expr2, location)
 		this.id = id
 	}
+	getType(){
+		return new VecType()
+	}
 }
 
 //Exp Con id y expresiones
