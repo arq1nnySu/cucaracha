@@ -68,8 +68,8 @@ Program.prototype.semanticize = function(){
 				}else{
 					var varlocal = varLocalTable[stats.id]
 					var gtype = stats.expresion.getType() 
-					if ( gtype != varlocal.type){
-						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + "pero se obtuvo: " + gtype , stats.location)							
+					if ( !gtype.equals(varlocal.type)){
+						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , stats.location)							
 					} 
 				}
 			}	

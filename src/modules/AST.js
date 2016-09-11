@@ -31,6 +31,10 @@ class ASTType extends ASTNode{
 	isVoid(){
 		return false
 	}
+
+	equals(type){
+		return this.toString() == type.toString()
+	}
 }
 
 class IntType extends ASTType { }
