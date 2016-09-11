@@ -64,35 +64,41 @@ Program.prototype.semanticize = function(){
 	_.values(functionTable).forEach(fun => {
 		var varLocalTable = this.initvarLocalTable(fun.parameters)
 		fun.block.statements.forEach(stats => {
-
-			if(stats instanceof StmtAssign){
-				if (!varLocalTable[stats.id]){
-					varLocalTable[stats.id] = stats
-				}else{
-					var varlocal = varLocalTable[stats.id]
-					var gtype = stats.expresion.getType() 
-					if ( !gtype.equals(varlocal.type)){
-						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , stats.location)							
-					} 
-				}
-			}
-			if(stats instanceof StmtVecAssign){
-				if (!varLocalTable[stats.id]){
-					varLocalTable[stats.id] = stats
-				}else{
-					var varlocal = varLocalTable[stats.id]
-					var gtype = stats.expresion.getType()
-					var gtypevalue = stats.secondExpresion.getType() 
-					if (!gtype.equals(typeInt)){
-						throw new SemanticError("En la expresion [e] se esperaba: "+ typeInt + " pero se obtuvo: "+ gtype , stats.location)							
-					}
-					if (!gtypevalue.equals(typeInt)){
-						throw new SemanticError("Los Vectores son de tipo: "+  typeInt , stats.location)							
-					} 
-				}
-			}	
+			stats.validate(varLocalTable)
 		})
 	})
 } 	
+
+ASTNode.prototype.validate = function(varTable){
+	
+}
+
+StmtAssign.prototype.validate = function(varTable){
+	if (!varTable[this.id]){
+		varTable[this.id] = this
+	}else{
+		var varlocal = varTable[this.id]
+		var gtype = this.expresion.getType() 
+		if ( !gtype.equals(varlocal.type)){
+			throw new SemanticError("Para la variable "+ this.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , this.location)							
+		} 
+	}
+}
+
+StmtVecAssign.prototype.validate = function(varTable){
+	if (!varTable[this.id]){
+		varTable[this.id] = this
+	}else{
+		var varlocal = varTable[this.id]
+		var gtype = this.expresion.getType()
+		var gtypevalue = this.secondExpresion.getType() 
+		if (!gtype.equals(typeInt)){
+			throw new SemanticError("En la expresion [e] se esperaba: "+ typeInt + " pero se obtuvo: "+ gtype , this.location)							
+		}
+		if (!gtypevalue.equals(typeInt)){
+			throw new SemanticError("Los Vectores son de tipo: "+  typeInt , this.location)							
+		} 
+	}
+}
 
 export default {}

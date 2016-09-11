@@ -280,5 +280,6 @@ window.ExprVecMake = ExprVecMake
 window.ExprCall = ExprCall
 window.ASTNodeIdAndExpresion = ASTNodeIdAndExpresion
 window.Location = Location
+window.ASTNode = ASTNode
 
 export default { }
