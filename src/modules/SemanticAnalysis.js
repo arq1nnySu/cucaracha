@@ -70,27 +70,42 @@ Program.prototype.semanticize = function(){
 					varLocalTable[stats.id] = stats
 				}else{
 					var varlocal = varLocalTable[stats.id]
-					var gtype = stats.expresion.getType() 
-					if ( !gtype.equals(varlocal.type)){
-						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , stats.location)							
+					var gtype = stats.expresion.getType()
+					if (!gtype.equals(varlocal.type)){
+						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , stats.location)								
 					} 
 				}
+				if (stats.expresion instanceof ExprVecLength){
+					var gtype = stats.expresion.getType()
+					var exp = varLocalTable[stats.expresion.value] 
+					if (!exp){
+						throw new SemanticError("La variable: "+ stats.expresion.value + " no esta definida", stats.location)
+					}else{
+						if(!gtype.equals(typeVec)){
+							throw new SemanticError("Para la variable: "+ stats.expresion.value + " se esperaba: " + typeVec + " pero se obtuvo: " + gtype, stats.location)
+						}
+					}
+				}
 			}
+
 			if(stats instanceof StmtVecAssign){
 				if (!varLocalTable[stats.id]){
-					varLocalTable[stats.id] = stats
-				}else{
-					var varlocal = varLocalTable[stats.id]
 					var gtype = stats.expresion.getType()
-					var gtypevalue = stats.secondExpresion.getType() 
+					var gtypevalue = stats.secondExpresion.getType()
 					if (!gtype.equals(typeInt)){
 						throw new SemanticError("En la expresion [e] se esperaba: "+ typeInt + " pero se obtuvo: "+ gtype , stats.location)							
 					}
 					if (!gtypevalue.equals(typeInt)){
 						throw new SemanticError("Los Vectores son de tipo: "+  typeInt , stats.location)							
 					} 
+					varLocalTable[stats.id] = stats
+				}else{
+					var stmtype = stats.getType() 
+					if (!stmtype.equals(typeVec)){
+						throw new SemanticError("Se esperaba: "+ typeVec + " pero se obtuvo: "+ exptype , stats.location)							
+					}
 				}
-			}	
+			}		
 		})
 	})
 } 	
