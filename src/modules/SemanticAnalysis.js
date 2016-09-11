@@ -18,7 +18,7 @@ Arrays.prototype.semanticizeElements = function(){
 Program.prototype.initvarLocalTable = function(parameters){ 
 	var table = {}
 	parameters.forEach(param => {
-		table[param.id] = param
+		table[param.id] = param.type
 	})
 	return table
 }
@@ -64,50 +64,221 @@ Program.prototype.semanticize = function(){
 	_.values(functionTable).forEach(fun => {
 		var varLocalTable = this.initvarLocalTable(fun.parameters)
 		fun.block.statements.forEach(stats => {
-
-			if(stats instanceof StmtAssign){
-				if (!varLocalTable[stats.id]){
-					varLocalTable[stats.id] = stats
-				}else{
-					var varlocal = varLocalTable[stats.id]
-					var gtype = stats.expresion.getType()
-					if (!gtype.equals(varlocal.type)){
-						throw new SemanticError("Para la variable "+ stats.id + " se esperaba: "+ varlocal.type + " pero se obtuvo: " + gtype , stats.location)								
-					} 
-				}
-				if (stats.expresion instanceof ExprVecLength){
-					var gtype = stats.expresion.getType()
-					var exp = varLocalTable[stats.expresion.value] 
-					if (!exp){
-						throw new SemanticError("La variable: "+ stats.expresion.value + " no esta definida", stats.location)
-					}else{
-						if(!gtype.equals(typeVec)){
-							throw new SemanticError("Para la variable: "+ stats.expresion.value + " se esperaba: " + typeVec + " pero se obtuvo: " + gtype, stats.location)
-						}
-					}
-				}
-			}
-
-			if(stats instanceof StmtVecAssign){
-				if (!varLocalTable[stats.id]){
-					var gtype = stats.expresion.getType()
-					var gtypevalue = stats.secondExpresion.getType()
-					if (!gtype.equals(typeInt)){
-						throw new SemanticError("En la expresion [e] se esperaba: "+ typeInt + " pero se obtuvo: "+ gtype , stats.location)							
-					}
-					if (!gtypevalue.equals(typeInt)){
-						throw new SemanticError("Los Vectores son de tipo: "+  typeInt , stats.location)							
-					} 
-					varLocalTable[stats.id] = stats
-				}else{
-					var stmtype = stats.getType() 
-					if (!stmtype.equals(typeVec)){
-						throw new SemanticError("Se esperaba: "+ typeVec + " pero se obtuvo: "+ exptype , stats.location)							
-					}
-				}
-			}		
+			stats.validate(varLocalTable)	
 		})
 	})
 } 	
+
+ASTNode.prototype.validate = function(varTable){
+	
+}
+
+StmtAssign.prototype.validate = function(varTable){
+	var expType = this.expresion.validate(varTable)
+	if (!varTable[this.id]){
+		varTable[this.id] = expType
+	}else{
+		var expectedType = varTable[this.id]
+		if ( !expType.equals(expectedType)){
+			throw new SemanticError("Para la variable "+ this.id + " se esperaba: "+ expectedType + " pero se obtuvo: " + expType , this.location)							
+		} 
+	}
+	return expType
+}
+
+ExprAdd.prototype.validate = function(varTable){
+	var intType = new IntType()
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return intType	
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)
+	}
+	 
+}
+
+ExprSub.prototype.validate = function(varTable){
+	var intType = new IntType()
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return intType	
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)
+	}
+}
+
+ExprMul.prototype.validate = function(varTable){
+	var intType = new IntType()
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return intType	
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)
+	}
+	 
+}
+
+ExprAnd.prototype.validate = function(varTable){
+	var boolType = new BoolType() 
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(boolType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+ExprOr.prototype.validate = function(varTable){
+	var boolType = new BoolType() 
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(boolType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+ExprNot.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var unaryType = this.expresion.validate(varTable) 
+	if(boolType.equals(unaryType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)
+	}
+}
+
+
+ExprEq.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType() 
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+ExprLt.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType() 
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+
+ExprGe.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType() 
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+
+ExprLe.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType()  
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}
+}
+
+ExprGt.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType()  
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}	
+}
+
+ExprNe.prototype.validate = function(varTable){
+	var boolType = new BoolType()
+	var intType = new IntType()  
+	var firstType = this.expresion.validate(varTable)
+	var secondType = this.secondExpresion.validate(varTable)
+	if(intType.equals(firstType) && firstType.equals(secondType)){
+		return boolType
+	}else{
+		throw new SemanticError("Error de tipos" , this.location)	
+	}	
+}
+
+StmtVecAssign.prototype.validate = function(varTable){
+	if (!varTable[this.id]){
+		varTable[this.id] = this
+	}else{
+		var varlocal = varTable[this.id]
+		var gtype = this.expresion.getType()
+		var gtypevalue = this.secondExpresion.getType() 
+		if (!gtype.equals(typeInt)){
+			throw new SemanticError("En la expresion [e] se esperaba: "+ typeInt + " pero se obtuvo: "+ gtype , this.location)							
+		}
+		if (!gtypevalue.equals(typeInt)){
+			throw new SemanticError("Los Vectores son de tipo: "+  typeInt , this.location)							
+		} 
+	}
+}
+
+ExprVecLength.prototype.validate = function(varTable){
+	var vecType = new VecType()
+	var vartype = varTable[this.value]
+	
+	if(!vartype){
+		throw new SemanticError("No esta definida la variable : "+ this.value , this.location)
+	}
+	if(!vecType.equals(vartype)){
+		throw new SemanticError("Para la variable: "+ this.value + " se esperaba: " + vecType + " pero se obtuvo: " + vartype, this.location)
+	}
+	return new IntType()
+}
+
+ExprVecMake.prototype.validate = function(varTable){
+	var intType = new IntType()
+	this.expresions.forEach(exp => {
+		var expType = exp.validate(varTable) 
+		if(!intType.equals(expType)){
+			throw new SemanticError("Se esperaba: " + intType + " pero se obtuvo: " + expType, this.location)	
+		}
+	})
+	return new VecType() 
+}
+
+ExprValue.prototype.validate = function(varTable){
+	return this.getType()
+}
+
+ExprVar.prototype.validate = function(varTable){
+	var vartype = varTable[this.value]
+	
+	if(!vartype){
+		throw new SemanticError("No esta definida la variable : "+ this.value , this.location)
+	}
+	return vartype
+}
 
 export default {}

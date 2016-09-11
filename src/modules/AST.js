@@ -32,14 +32,38 @@ class ASTType extends ASTNode{
 		return false
 	}
 
+	isBool(){
+		return false
+	}
+
+	isInt(){
+		return false
+	}
+
+	isVec(){
+		return false
+	}
+
 	equals(type){
 		return this.toString() == type.toString()
 	}
 }
 
-class IntType extends ASTType { }
-class BoolType extends ASTType { }
-class VecType extends ASTType { }
+class IntType extends ASTType {
+	isInt(){
+		return true
+	}
+}
+class BoolType extends ASTType {
+	isBool(){
+		return true
+	}
+}
+class VecType extends ASTType {
+	isVec(){
+		return true
+	}
+}
 class UnitType extends ASTType { 
 	isVoid(){
 		return true
@@ -280,5 +304,6 @@ window.ExprVecMake = ExprVecMake
 window.ExprCall = ExprCall
 window.ASTNodeIdAndExpresion = ASTNodeIdAndExpresion
 window.Location = Location
+window.ASTNode = ASTNode
 
 export default { }
