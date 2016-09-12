@@ -249,7 +249,7 @@ ExprVecLength.prototype.validate = function(varTable){
 	var vartype = varTable[this.value]
 	
 	if(!vartype){
-		throw new SemanticError("No esta definida la variable : "+ this.value , this.location)
+		throw new SemanticError("No esta definida la variable: "+ this.value , this.location)
 	}
 	if(!vecType.equals(vartype)){
 		throw new SemanticError("Para la variable: "+ this.value + " se esperaba: " + vecType + " pero se obtuvo: " + vartype, this.location)
@@ -268,17 +268,17 @@ ExprVecMake.prototype.validate = function(varTable){
 	return new VecType() 
 }
 
-ExprVecDeref.validate = function(varTable){
+ExprVecDeref.prototype.validate = function(varTable){
 	var vecType = new VecType()
 	var intType = new IntType()
 	var varType = varTable[this.id]
 	var expType = this.expresion.validate(varTable)
 
 	if(!varType){
-		throw new SemanticError("No esta definida la variable : "+ this.id , this.location)
+		throw new SemanticError("No esta definida la variable: "+ this.id , this.location)
 	}
 	if(!vecType.equals(varType)){
-		throw new SemanticError("Para la variable" + this.id + "Se esperaba: " + vecType + " pero se obtuvo: " + varType, this.location)	
+		throw new SemanticError("Para la variable: " + this.id + " Se esperaba: " + vecType + " pero se obtuvo: " + varType, this.location)	
 	}
 	if(!intType.equals(expType)){
 		throw new SemanticError("Se esperaba: " + intType + " pero se obtuvo: " + expType, this.location)		
@@ -294,7 +294,7 @@ ExprVar.prototype.validate = function(varTable){
 	var vartype = varTable[this.value]
 	
 	if(!vartype){
-		throw new SemanticError("No esta definida la variable : "+ this.value , this.location)
+		throw new SemanticError("No esta definida la variable: " + this.value , this.location)
 	}
 	return vartype
 }
