@@ -31,7 +31,7 @@ Program.prototype.initTable = function(){
 	var block = new Block([], location)
 	var char = new Fun("putChar", typer, [param], block, location)
 	var num = new Fun("putNum", typer, [param], block, location)
-	return {char, num}
+	return {putChar:char, putNum:num}
 }
 
 Program.prototype.semanticize = function(){
@@ -122,8 +122,10 @@ StmtExpresionBlock.prototype.validate = function(varTable, functionTable){
 	this.block.validate(varTable, functionTable)
 }
 
-StmtIfElse.prototype.validate = (StmtExpresionBlock.prototype.validate)(this.elseBlock.validate(varTable, functionTable))
-
+StmtIfElse.prototype.validate = function(varTable, functionTable){
+	StmtExpresionBlock.prototype.validate.bind(this)(varTable, functionTable)
+	this.elseBlock.validate(varTable, functionTable)
+}
 
 ExprAdd.prototype.validate = function(varTable, functionTable){
 	var intType = new IntType()
@@ -223,7 +225,7 @@ ExprVecMake.prototype.validate = function(varTable, functionTable){
 	return new VecType() 
 }
 
-ExprVecDeref.validate = function(varTable, functionTable){
+ExprVecDeref.prototype.validate = function(varTable, functionTable){
 	var vecType = new VecType()
 	var intType = new IntType()
 	var varType = this.getVar(this.id, varTable)
