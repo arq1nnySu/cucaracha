@@ -268,6 +268,24 @@ ExprVecMake.prototype.validate = function(varTable){
 	return new VecType() 
 }
 
+ExprVecDeref.validate = function(varTable){
+	var vecType = new VecType()
+	var intType = new IntType()
+	var varType = varTable[this.id]
+	var expType = this.expresion.validate(varTable)
+
+	if(!varType){
+		throw new SemanticError("No esta definida la variable : "+ this.id , this.location)
+	}
+	if(!vecType.equals(varType)){
+		throw new SemanticError("Para la variable" + this.id + "Se esperaba: " + vecType + " pero se obtuvo: " + varType, this.location)	
+	}
+	if(!intType.equals(expType)){
+		throw new SemanticError("Se esperaba: " + intType + " pero se obtuvo: " + expType, this.location)		
+	}
+
+}
+
 ExprValue.prototype.validate = function(varTable){
 	return this.getType()
 }
