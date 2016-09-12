@@ -19,6 +19,10 @@ class ASTNode{
 	toString(){
 		return this.constructor.name 
 	}
+
+	equals(type){
+		return this.toString() == type.toString()
+	}
 }
 
 
@@ -44,9 +48,6 @@ class ASTType extends ASTNode{
 		return false
 	}
 
-	equals(type){
-		return this.toString() == type.toString()
-	}
 }
 
 class IntType extends ASTType {
