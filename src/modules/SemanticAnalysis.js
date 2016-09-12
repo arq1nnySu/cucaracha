@@ -99,6 +99,20 @@ StmtAssign.prototype.validate = function(varTable, functionTable){
 	return expType
 }
 
+
+
+StmtExpresionBlock.prototype.validate = function(varTable, functionTable){
+	var boolType = new BoolType()
+	var expType = this.expresion.validate(varTable, functionTable)
+	if(!boolType.equals(expType)){
+		this.throwSemanticError("La condicion deberia de ser: "+ boolType + " pero se obtuvo: " + expType)
+	}
+	this.block.validate(varTable, functionTable)
+}
+
+StmtIfElse.prototype.validate = (StmtExpresionBlock.prototype.validate)(this.elseBlock.validate(varTable, functionTable))
+
+
 ExprAdd.prototype.validate = function(varTable, functionTable){
 	var intType = new IntType()
 	var firstType = this.expresion.validate(varTable, functionTable)
