@@ -63,9 +63,7 @@ Program.prototype.semanticize = function(){
 	}
 	_.values(functionTable).forEach(fun => {
 		var varLocalTable = this.initvarLocalTable(fun.parameters)
-		fun.block.statements.forEach(stats => {
-			stats.validate(varLocalTable, functionTable)
-		})
+		fun.block.validate(varLocalTable, functionTable, fun)
 	})
 } 	
 
@@ -84,6 +82,20 @@ ASTNode.prototype.getVar = function(name, varTable){
 		this.throwSemanticError("No esta definida la variable: "+ name)
 	}
 	return vartype
+}
+
+ASTNode.prototype.getFun = function(name, funTable){
+	var fun = funTable[name]
+	if(!fun){
+		this.throwSemanticError("La function "+ name + " no esta definida")
+	}
+	return fun
+}
+
+Block.prototype.validate = function(varTable, functionTable, fun){
+	this.statements.forEach(stats => {
+		stats.validate(varTable, functionTable, fun, this)
+	})
 }
 
 StmtAssign.prototype.validate = function(varTable, functionTable){
@@ -235,10 +247,7 @@ ExprVar.prototype.validate = function(varTable, functionTable){
 }
 
 ExprCall.prototype.validate = function(varTable, functionTable){
-	var fun = functionTable[this.id]
-	if(!fun){
-		this.throwSemanticError("La function "+ this.id + " no esta definida")
-	}
+	var fun = this.getFun(this.id, functionTable)
 
 	if(fun.parameters.length != this.expresions.length){
 		this.throwSemanticError("La cantidad de parámetros es incorrecto se esperaban " + fun.parameters.length + " y se obtuvieron " + this.expresions.length)
@@ -257,5 +266,19 @@ ExprCall.prototype.validate = function(varTable, functionTable){
 }
 
 StmtCall.prototype.validate = ExprCall.prototype.validate
+
+StmtReturn.prototype.validate = function(varTable, functionTable, fun, block){
+	var expType = this.expresion.validate(varTable, functionTable)
+	if(!expType.equals(fun.type)){
+		this.throwSemanticError("Tipo de retorno inválido se esperaba: "+ fun.type + " pero se obtuvo: " + expType)
+	}
+
+	var lastStmt = _.last(block.statements)
+
+	if(!lastStmt.equals(this) || (lastStmt.location.first_line != this.location.first_line) ){
+		this.throwSemanticError("El return va al final del bloque")
+	}
+
+}
 
 export default {}
