@@ -134,7 +134,7 @@ ExprAdd.prototype.validate = function(varTable, functionTable){
 	if(intType.equals(firstType) && firstType.equals(secondType)){
 		return intType	
 	}else{
-		this.throwSemanticError("Error de tipos")
+		this.throwSemanticError(`Error de tipos: Se esperaba ${intType}:${intType} y se optuvo ${firstType}:${secondType}`)
 	}
 	 
 }
@@ -149,7 +149,7 @@ ExprAnd.prototype.validate = function(varTable, functionTable){
 	if(boolType.equals(firstType) && firstType.equals(secondType)){
 		return boolType
 	}else{
-		this.throwSemanticError("Error de tipos")
+		this.throwSemanticError(`Error de tipos: Se esperaba ${boolType}:${boolType} y se optuvo ${firstType}:${secondType}`)
 	}
 }
 
@@ -161,7 +161,7 @@ ExprNot.prototype.validate = function(varTable, functionTable){
 	if(boolType.equals(unaryType)){
 		return boolType
 	}else{
-		this.throwSemanticError("Error de tipos")
+		this.throwSemanticError(`Error de tipos: Se esperaba ${boolType} y se optuvo ${unaryType}`)
 	}
 }
 
@@ -174,7 +174,7 @@ ExprEq.prototype.validate = function(varTable, functionTable){
 	if(intType.equals(firstType) && firstType.equals(secondType)){
 		return boolType
 	}else{
-		this.throwSemanticError("Error de tipos")
+		this.throwSemanticError(`Error de tipos: Se esperaba ${intType}:${intType} y se optuvo ${firstType}:${secondType}`)
 	}
 }
 
@@ -192,10 +192,10 @@ StmtVecAssign.prototype.validate = function(varTable, functionTable){
 	var expType = this.expresion.validate(varTable, functionTable)
 	var secondType = this.secondExpresion.validate(varTable, functionTable)
 	if(!varType){
-		throw new SemanticError("No esta definida la variable: "+ this.id , this.location)
+		this.throwSemanticError("No esta definida la variable: "+ this.id)
 	}
 	if(!vecType.equals(varType)){
-		throw new SemanticError("Para la variable: "+ this.id + " se esperaba: " + vecType + " pero se obtuvo: " + varType, this.location)
+		this.throwSemanticError("Para la variable: "+ this.id + " se esperaba: " + vecType + " pero se obtuvo: " + varType)
 	}
 	if(!(intType.equals(expType) && expType.equals(secondType))){ 
 		throw new SemanticError("Error de tipos" , this.location)	
