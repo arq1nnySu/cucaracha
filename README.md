@@ -5,9 +5,22 @@
 [IDE Web](https://arq1nnysu.github.io/cucaracha/)
 
 
+## Requerimientos
+
+[Nodejs v6.5.0](https://nodejs.org/en/download/current/)
+
+## Para instalar todas las bibliotecas que utilizamos (Necesario una única vez)
+
+```bash
+	sh install.sh
+```
+
 ## Para levantar la aplicación
 
-    npm i && gulp
+    
+```bash
+	sh run.sh
+```
 
 ##Enunciado
 [Enuunciado.pdf](resources/Enunciado.pdf)
