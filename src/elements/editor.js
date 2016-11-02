@@ -35,8 +35,10 @@ Polymer({
         }
 
         this.compile(ast)
+        // this.interpret(ast)
 
-        $("#result").html(ast.serialize())
+        $("#result_parsed").html(ast.serialize())
+        $("#result_compiled").html(ast.compile())
       },
 
       parse: function(sourceCode) {
@@ -57,6 +59,7 @@ Polymer({
       },
       
       interpret: function(ast, initialState) {
+        ast.compile()
       },
 
       reportError: function(err) {

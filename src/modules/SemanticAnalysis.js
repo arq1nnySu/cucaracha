@@ -23,19 +23,8 @@ Program.prototype.initvarLocalTable = function(parameters){
 	return table
 }
 
-Program.prototype.initTable = function(){ 
-	var typer = new UnitType()
-	var typep = new IntType()
-	var location = new Location(0,0,0,0)
-	var param = new Parameter("x", typep, location)
-	var block = new Block([], location)
-	var char = new Fun("putChar", typer, [param], block, location)
-	var num = new Fun("putNum", typer, [param], block, location)
-	return {putChar:char, putNum:num}
-}
-
 Program.prototype.semanticize = function(){
-	var functionTable = this.initTable()
+	var functionTable = {}
 	var typeInt = new IntType()
 	var typeBool = new BoolType()
 	var typeVec = new VecType()

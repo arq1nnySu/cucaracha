@@ -92,7 +92,18 @@ class Program extends Arrays{
 	constructor(location){
 		super()
 		this.location = location
+		this.init()
+	}
 
+	init(){ 
+		var typer = new UnitType()
+		var typep = new IntType()
+		var location = new Location(0,0,0,0)
+		var param = new Parameter("x", typep, location)
+		var block = new Block(new Arrays(), location)
+		this.add(new Fun("putChar", typer, new Arrays(param), block, location))
+		this.add(new Fun("putNum", typer, new Arrays(param), block, location))
+		
 	}
 
 	serialize(){
