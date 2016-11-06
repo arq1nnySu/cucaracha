@@ -1,40 +1,72 @@
 import AST from './AST';
 
-Program.prototype.compile = function(){
+class Writer {
+	constructor(){
+		this.sectionMap = {data:"", text:"",codeFuns:""}
+	}
 
-	let code = "section .text \n";
-	code += "global _main \n"
-	code += "extern _exit , _putchar \n"
-	this.forEach(f => code += f.compile())
-	code += " \n _main: \n"
-	code += "call cuca_main".tab()
-	code += "mov rdi, 0".tab()
-	code += "ret".tab()
-	return code
+	addSection(sectName){
+		this.sectionMap[sectName] = "" 
+	}
 
+	writeSection(sectName, line){
+		this.sectionMap[sectName] = this.sectionMap[sectName] + line
+	}
+
+	write(line){
+		this.writeSection("codeFuns", line+"\n")
+	}
+	writeT(line){
+		this.writeSection("codeFuns", line.tab())
+	}
+
+	getSection(sectName){
+		return "section ." + sectName + "\n" + this.sectionMap[sectName]
+	}
+
+	build(){
+		return this.sectionMap.data+"\n"+this.sectionMap.text+"\n"+this.sectionMap.codeFuns;
+	}
 }
 
-Fun.prototype.compile = function(){
+Program.prototype.compile = function(){
+	let writer = new Writer() 
+	writer.writeSection("text", "section . text \n")
+	writer.writeSection("data", "section . data \n")
+	writer.writeSection("text", "global main \n")
+	writer.writeSection("text", "extern exit")
+	//_putchar
+	this.forEach(f => f.compile(writer))
+	writer.write("_main:")
+	writer.writeT( "call cuca_main")
+	writer.writeT( "mov rdi, 0")
+	writer.writeT( "ret")
+	return writer.build()
+}
+
+Fun.prototype.compile = function(writer){
 	if(this.id == "putChar" || this.id == "putNum") return "";
-	let code = "cuca_"+this.id + ":\n";
-	code += this.block.compile().tab()
-	code += "ret \n".tab()
-	return code
+	writer.write("cuca_"+this.id+":")
+	this.block.compile(writer)
 } 	
 
-Block.prototype.compile = function(){
-	let code = ""
-	this.statements.forEach(s => code += s.compile())
-	return code
+Block.prototype.compile = function(writer){
+	this.statements.forEach(s => s.compile(writer))
+	writer.writeT( "ret")
 }
 
-StmtCall.prototype.compile = function(){
-	let code = ""
+StmtCall.prototype.compile = function(writer){
 	if(this.id == "putChar"){
-		code += "mov rdi , "+this.expresions[0].value + "\n"
-		code += "call _putchar \n"
+		writer.writeT("mov rdi , "+this.expresions[0].value) 
+		writer.writeT("call _putchar")
 	}
-	return code;
+	if(this.id == "putNum"){
+		writer.writeSection("data", "lli_format_string db '% lli' \n")
+		writer.writeT("mov rsi , "+this.expresions[0].value)
+		writer.writeT("mov rdi , lli_format_string")
+		writer.writeT("mov rax , 0")
+		writer.writeT("call printf")
+	}
 }
 
 export default {}
