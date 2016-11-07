@@ -1,8 +1,17 @@
 import AST from './AST';
 
+
 class Writer {
-	constructor(){
+	constructor(arquitecture){
+		this.arquitecture = arquitecture;
 		this.sectionMap = {data:"", text:"",codeFuns:""}
+	}
+
+	get(value){
+		if(this.arquitecture == 'macos'){
+			return "_"+value;
+		}
+		return value;
 	}
 
 	addSection(sectName){
@@ -35,18 +44,18 @@ class Writer {
 	}
 }
 
-Program.prototype.compile = function(){
-	let writer = new Writer() 
+Program.prototype.compile = function(arquitecture){
+	let writer = new Writer(arquitecture) 
 	writer.writeSection("data", "section .data \n")
 	writer.writeSection("text", "section .text \n")
-	writer.writeSection("text", "global main \n")
-	writer.writeSection("text", "extern exit")
+	writer.writeSection("text", `global ${writer.get('main')} \n`)
+	writer.writeSection("text", `extern ${writer.get('exit')}`)
 	//_putchar
 	this.forEach(f => f.compile(writer))
-	writer.write("main:")
+	writer.write(`${writer.get('main')}:`)
 	writer.writeT( "call cuca_main")
 	writer.writeT( "mov rdi, 0")
-	writer.writeT( "call exit")
+	writer.writeT( `call ${writer.get('exit')}`)
 	return writer.build()
 }
 
@@ -63,17 +72,17 @@ Block.prototype.compile = function(writer){
 
 StmtCall.prototype.compile = function(writer){
 	if(this.id == "putChar"){
-		writer.writeText(", putChar")
+		writer.writeText(`, ${writer.get('putChar')}:`)
 		writer.writeT("mov rdi, "+this.expresions[0].value) 
-		writer.writeT("call putchar")
+		writer.writeT(`call ${writer.get('putChar')}`)
 	}
 	if(this.id == "putNum"){
-		writer.writeText(", printf")
+		writer.writeText(`, ${writer.get('printf')}`)
 		writer.writeSection("data", "lli_format_string db '% lli'")
 		writer.writeT("mov rsi, "+this.expresions[0].value)
 		writer.writeT("mov rdi, lli_format_string")
 		writer.writeT("mov rax, 0")
-		writer.writeT("call printf")
+		writer.writeT(`call ${writer.get('printf')} `)
 	}
 }
 
