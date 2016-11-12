@@ -55,7 +55,7 @@ Program.prototype.compile = function(arquitecture){
 	writer.write(`${writer.get('main')}:`)
 	writer.writeT( "call cuca_main")
 	writer.writeT( "mov rdi, 0")
-	writer.writeT( `call ${writer.get('exit')}`)
+	writer.writeT( `ret`)
 	return writer.build()
 }
 
