@@ -61,7 +61,7 @@ Program.prototype.compile = function(arquitecture){
 
 Fun.prototype.compile = function(writer){
 	var varLocal = {}
-	var spcreq = (this.parameters.length+1) * 8 // +1 es porque se guarda el valor de retorno
+	var spcreq = (this.parameters.length) * 8 // +1 es porque se guarda el valor de retorno
 	
 	if(this.id == "putChar" || this.id == "putNum") return "";
 	writer.write("cuca_"+this.id+":")
@@ -69,7 +69,7 @@ Fun.prototype.compile = function(writer){
 	writer.writeT("mov rbp, rsp")
 	this.parameters.forEach(p => {
 		varLocal[p.id] = spcreq
-		spcreq = spcreq -8
+		spcreq = spcreq+8 
 		})
 	this.block.compile(writer, varLocal)
 } 	
@@ -82,14 +82,14 @@ Block.prototype.compile = function(writer, varLocal){
 
 StmtCall.prototype.compile = function(writer, varLocal){
 	if(this.id == "putChar"){
-		writer.writeText(`, ${writer.get('putChar')}:`)
+		writer.writeText(`, ${writer.get('putchar')}`)
 		if (!varLocal[this.expresions[0].value]) {
 			writer.writeT("mov rdi, "+this.expresions[0].value) 	
 		}
 		else{
 			writer.writeT("mov rdi, [rbp + "+varLocal[this.expresions[0].value]+"]")
 		}
-		writer.writeT(`call ${writer.get('putChar')}`)
+		writer.writeT(`call ${writer.get('putchar')}`)
 	}
 	if(this.id == "putNum"){
 		writer.writeText(`, ${writer.get('printf')}`)
