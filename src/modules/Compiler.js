@@ -61,7 +61,7 @@ Program.prototype.compile = function(arquitecture){
 
 Fun.prototype.compile = function(writer){
 	var varLocal = {}
-	var spcreq = (this.parameters.length) * 8 // +1 es porque se guarda el valor de retorno
+	var spcreq = (this.parameters.length+1) * 8 // +1 es porque se guarda el valor de retorno
 	
 	if(this.id == "putChar" || this.id == "putNum") return "";
 	writer.write("cuca_"+this.id+":")
