@@ -38,7 +38,7 @@ Polymer({
         // this.interpret(ast)
 
         $("#result_parsed").html(ast.serialize())
-        $("#result_compiled").html(ast.compile())
+        $("#result_compiled").html(ast.compile($("#arquitecture").val()))
       },
 
       parse: function(sourceCode) {

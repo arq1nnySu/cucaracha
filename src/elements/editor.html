@@ -33,7 +33,13 @@ fun main() {
 
     </ace-widget>
     <div class="result_container">
-        <div><input type="button"  value="Parsear" on-click="runCode" ></input></div>
+        <div>
+          <input type="button"  value="Parsear" on-click="runCode" ></input>
+            <select id="arquitecture">
+              <option value="linux">Linux</option>
+              <option value="macos">Mac</option>
+            </select>
+        </div>
         <div><textarea class="result_code" id="result_parsed" disabled></textarea></div>
         <div><textarea class="result_code" id="result_compiled" ></textarea></div>
     </div>
