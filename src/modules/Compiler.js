@@ -67,6 +67,9 @@ Fun.prototype.compile = function(writer){
 	writer.write("cuca_"+this.id+":")
 	writer.writeT("push rbp")
 	writer.writeT("mov rbp, rsp")
+	// tengo que diferenciar parametros de variables de contexto nuevas. 
+	// Y si existe una asignacion nueva con respecto a una variable que referencia 
+	// al valor de un parametro que ya se guardo en la pila
 	this.parameters.forEach(p => {
 		varLocal[p.id] = spcreq
 		spcreq = spcreq+8 
@@ -76,6 +79,7 @@ Fun.prototype.compile = function(writer){
 
 Block.prototype.compile = function(writer, varLocal){
 	this.statements.forEach(s => s.compile(writer, varLocal))
+	writer.writeT("mov rbp, rsp")
 	writer.writeT("pop rbp")
 	writer.writeT( "ret")
 }
@@ -83,11 +87,15 @@ Block.prototype.compile = function(writer, varLocal){
 StmtCall.prototype.compile = function(writer, varLocal){
 	if(this.id == "putChar"){
 		writer.writeText(`, ${writer.get('putchar')}`)
-		if (!varLocal[this.expresions[0].value]) {
+		if (varLocal == {}) {
 			writer.writeT("mov rdi, "+this.expresions[0].value) 	
 		}
 		else{
-			writer.writeT("mov rdi, [rbp + "+varLocal[this.expresions[0].value]+"]")
+			if(varLocal["N_"+this.expresions[0].value]){
+				writer.writeT("mov rdi, [rbp - "+varLocal["N_"+this.expresions[0].value]+"]")
+			}else{
+				writer.writeT("mov rdi, [rbp + "+varLocal[this.expresions[0].value]+"]")
+			}
 		}
 		writer.writeT(`call ${writer.get('putchar')}`)
 	}
@@ -107,8 +115,19 @@ StmtCall.prototype.compile = function(writer, varLocal){
       this.expresions.forEach(e => { e.compile(writer,i) 
       i=i+8 })
       writer.writeT("call cuca_"+this.id)
-      writer.writeT("add rsp, "+spcreq)
     }
+}
+
+StmtAssign.prototype.compile = function(writer, varLocal){
+	if(!varLocal[this.id]){
+		writer.writeT("sub rsp, "+8)
+		writer.writeT("mov rdi, "+this.expresion.value)
+		writer.writeT("mov [rbp - "+8+"], rdi")
+		varLocal["N_"+this.id] = 8		
+	}else{
+		writer.writeT("mov rdi, "+this.expresion.value)
+		writer.writeT("mov [rbp + "+varLocal[this.id]+"], rdi")
+	}
 }
 
 ExprConstNum.prototype.compile = function(writer, i){
