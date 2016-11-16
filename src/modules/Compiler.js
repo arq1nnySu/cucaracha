@@ -67,9 +67,6 @@ Fun.prototype.compile = function(writer){
 	writer.write("cuca_"+this.id+":")
 	writer.writeT("push rbp")
 	writer.writeT("mov rbp, rsp")
-	// tengo que diferenciar parametros de variables de contexto nuevas. 
-	// Y si existe una asignacion nueva con respecto a una variable que referencia 
-	// al valor de un parametro que ya se guardo en la pila
 	this.parameters.forEach(p => {
 		varLocal[p.id] = spcreq
 		spcreq = spcreq+8 
@@ -77,14 +74,23 @@ Fun.prototype.compile = function(writer){
 	this.block.compile(writer, varLocal)
 } 	
 
+
+function isNewVar(item) {
+  return item.includes("N_");
+}
+
 Block.prototype.compile = function(writer, varLocal){
-	this.statements.forEach(s => s.compile(writer, varLocal))
-	writer.writeT("mov rbp, rsp")
+	var i=1
+	this.statements.forEach(s => { s.compile(writer, i, varLocal)
+		if ( Object.keys(varLocal).filter(isNewVar).length >= i){
+			i=i+1
+		}})
+	writer.writeT("mov rsp, rbp")
 	writer.writeT("pop rbp")
 	writer.writeT( "ret")
 }
 
-StmtCall.prototype.compile = function(writer, varLocal){
+StmtCall.prototype.compile = function(writer, i, varLocal){
 	if(this.id == "putChar"){
 		writer.writeText(`, ${writer.get('putchar')}`)
 		if (varLocal == {}) {
@@ -109,30 +115,30 @@ StmtCall.prototype.compile = function(writer, varLocal){
 	}
 
 	if(this.id !="putNum" && this.id !="putChar"){
-      var i=0
+      var c=0
       var spcreq = this.expresions.length * 8 
       writer.writeT("sub rsp, "+spcreq)
-      this.expresions.forEach(e => { e.compile(writer,i) 
-      i=i+8 })
+      this.expresions.forEach(e => { e.compile(writer,c) 
+      c=c+8 })
       writer.writeT("call cuca_"+this.id)
     }
 }
 
-StmtAssign.prototype.compile = function(writer, varLocal){
+StmtAssign.prototype.compile = function(writer, i, varLocal){
 	if(!varLocal[this.id]){
-		writer.writeT("sub rsp, "+8)
+		writer.writeT("sub rsp, "+i*8)
 		writer.writeT("mov rdi, "+this.expresion.value)
-		writer.writeT("mov [rbp - "+8+"], rdi")
-		varLocal["N_"+this.id] = 8		
+		writer.writeT("mov [rbp - "+i*8+"], rdi")
+		varLocal["N_"+this.id] = i*8		
 	}else{
 		writer.writeT("mov rdi, "+this.expresion.value)
 		writer.writeT("mov [rbp + "+varLocal[this.id]+"], rdi")
 	}
 }
 
-ExprConstNum.prototype.compile = function(writer, i){
+ExprConstNum.prototype.compile = function(writer, c){
 	writer.writeT("mov rdi, "+this.value)
-	writer.writeT("mov [rsp + "+i+"], rdi")
+	writer.writeT("mov [rsp + "+c+"], rdi")
 }
 
 export default {}
