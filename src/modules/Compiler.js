@@ -50,7 +50,7 @@ Program.prototype.compile = function(arquitecture){
 	writer.writeSection("text", "section .text \n")
 	writer.writeSection("text", `global ${writer.get('main')} \n`)
 	writer.writeSection("text", `extern ${writer.get('exit')}`)
-	//_putchar
+	
 	this.forEach(f => f.compile(writer))
 	writer.write(`${writer.get('main')}:`)
 	writer.writeT( "call cuca_main")
@@ -64,13 +64,16 @@ Fun.prototype.compile = function(writer){
 	var spcreq = (this.parameters.length+1) * 8 // +1 es porque se guarda el valor de retorno
 	
 	if(this.id == "putChar" || this.id == "putNum") return "";
+	
 	writer.write("cuca_"+this.id+":")
 	writer.writeT("push rbp")
 	writer.writeT("mov rbp, rsp")
+	
 	this.parameters.forEach(p => {
 		varLocal[p.id] = spcreq
 		spcreq = spcreq+8 
 		})
+	this.block.bookspace(writer, varLocal)
 	this.block.compile(writer, varLocal)
 } 	
 
@@ -79,15 +82,27 @@ function isNewVar(item) {
   return item.includes("N_");
 }
 
-Block.prototype.compile = function(writer, varLocal){
-	var i=1
-	this.statements.forEach(s => { s.compile(writer, i, varLocal)
-		if ( Object.keys(varLocal).filter(isNewVar).length >= i){
+Block.prototype.bookspace = function(writer, varLocal){
+	var i=0
+	this.statements.forEach(s => { s.bookspace(writer, i, varLocal)
+		if (Object.keys(varLocal).filter(isNewVar).length > i){
 			i=i+1
 		}})
+	if(i>0){
+		writer.writeT("sub rsp, "+i*8)
+	}
+}
+
+Block.prototype.compile = function(writer, varLocal){
+	var i=1
+	this.statements.forEach(s => s.compile(writer, i, varLocal))
 	writer.writeT("mov rsp, rbp")
 	writer.writeT("pop rbp")
 	writer.writeT( "ret")
+}
+
+StmtCall.prototype.bookspace = function(writer, i, varLocal){
+
 }
 
 StmtCall.prototype.compile = function(writer, i, varLocal){
@@ -124,16 +139,20 @@ StmtCall.prototype.compile = function(writer, i, varLocal){
     }
 }
 
-StmtAssign.prototype.compile = function(writer, i, varLocal){
+StmtAssign.prototype.bookspace = function(writer, i, varLocal){
 	if(!varLocal[this.id]){
-		writer.writeT("sub rsp, "+i*8)
+		varLocal["N_"+this.id] = (i+1)*8
+	}	
+}
+
+StmtAssign.prototype.compile = function(writer, i, varLocal){
+	if(varLocal["N_"+this.id]){
 		writer.writeT("mov rdi, "+this.expresion.value)
-		writer.writeT("mov [rbp - "+i*8+"], rdi")
-		varLocal["N_"+this.id] = i*8		
+		writer.writeT("mov [rbp - "+varLocal["N_"+this.id]+"], rdi")
 	}else{
 		writer.writeT("mov rdi, "+this.expresion.value)
 		writer.writeT("mov [rbp + "+varLocal[this.id]+"], rdi")
-	}
+	}	
 }
 
 ExprConstNum.prototype.compile = function(writer, c){
