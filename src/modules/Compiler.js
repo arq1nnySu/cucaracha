@@ -186,7 +186,7 @@ StmtAssign.prototype.compile = function(writer, i, varLocal) {
     } else {
         salt = varLocal[this.id]
     }
-    var reg = this.expresion.compile(writer, i);
+    var reg = this.expresion.compile(writer, i, varLocal);
     salt = `[rbp -  ${salt}]`
     writer.writeT(`mov ${salt}, ${reg.id}`)
     return { id: salt }
@@ -304,7 +304,7 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
     usedRegisters.forEach(reg => writer.writeT(`pop ${reg.id}`))
     var reg = writer.giveRegister()
     writer.writeT(`mov ${reg.id}, rax`)
-    
+
     return reg;
 }
 
