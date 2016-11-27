@@ -2,46 +2,56 @@ import AST from './AST';
 
 
 class Writer {
-	constructor(arquitecture){
-		this.arquitecture = arquitecture;
-		this.sectionMap = {data:"", text:"",codeFuns:""}
-	}
+    constructor(arquitecture) {
+        this.arquitecture = arquitecture;
+        this.sectionMap = { data: "", text: "", codeFuns: "" }
+        this.AllRegisters = ["rdi", "rsi", "rax", "rbx", "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
+        this.registers = this.AllRegisters + [];
+    }
 
-	get(value){
-		if(this.arquitecture == 'macos'){
-			return "_"+value;
-		}
-		return value;
-	}
+    get(value) {
+        if (this.arquitecture == 'macos') {
+            return "_" + value;
+        }
+        return value;
+    }
 
-	addSection(sectName){
-		this.sectionMap[sectName] = "" 
-	}
+    addSection(sectName) {
+        this.sectionMap[sectName] = ""
+    }
 
-	writeSection(sectName, line){
-		this.sectionMap[sectName] = this.sectionMap[sectName] + line
-	}
+    writeSection(sectName, line) {
+        this.sectionMap[sectName] = this.sectionMap[sectName] + line
+    }
 
 
-	write(line){
-		this.writeSection("codeFuns", line+"\n")
-	}
-	writeText(line){
-		if (!this.sectionMap["text"].includes(line)){
-			this.writeSection("text", line)	
-		}
-	}
-	writeT(line){
-		this.writeSection("codeFuns", line.tab())
-	}
+    write(line) {
+        this.writeSection("codeFuns", line + "\n")
+    }
+    writeText(line) {
+        if (!this.sectionMap["text"].includes(line)) {
+            this.writeSection("text", line)
+        }
+    }
+    writeT(line) {
+        this.writeSection("codeFuns", line.tab())
+    }
 
-	getSection(sectName){
-		return "section ." + sectName + "\n" + this.sectionMap[sectName]
-	}
+    getSection(sectName) {
+        return "section ." + sectName + "\n" + this.sectionMap[sectName]
+    }
 
-	build(){
-		return this.sectionMap.data+"\n"+this.sectionMap.text+"\n"+this.sectionMap.codeFuns;
-	}
+    build() {
+        return this.sectionMap.data + "\n" + this.sectionMap.text + "\n" + this.sectionMap.codeFuns;
+    }
+
+    giveRegister() {
+        this.register.shift();
+    }
+
+    addRegister(reg) {
+        this.register.splice(0, 0, reg);
+    }
 }
 
 Program.prototype.compile = function(arquitecture){
@@ -79,7 +89,7 @@ Fun.prototype.compile = function(writer){
 
 
 function isNewVar(item) {
-  return item.includes("N_");
+    return item.includes("N_");
 }
 
 Block.prototype.bookspace = function(writer, varLocal){
@@ -154,10 +164,33 @@ StmtAssign.prototype.compile = function(writer, i, varLocal){
 		writer.writeT("mov [rbp + "+varLocal[this.id]+"], rdi")
 	}	
 }
+ExprConstNum.prototype.compile = function(writer) {
+    writer.writeT("mov rdi, " + this.value)
+}
 
-ExprConstNum.prototype.compile = function(writer, c){
-	writer.writeT("mov rdi, "+this.value)
-	writer.writeT("mov [rsp + "+c+"], rdi")
+ExprConstBool.prototype.compile = function(writer, i) {
+    if (this.value) {
+        writer.writeT("mov rsi, -1")
+    } else {
+        writer.writeT("mov rdi, 0")
+    }
+}
+
+let aritmeticos = function(writer, c) {
+    if (this.isConstant) {
+        var reg = write.giveRegister();
+        writer.writeT(`mov ${reg}, ${this.eval()}`)
+        writer.addRegister(reg);
+    } else if (this.secondExpresion == undefined) {
+        this.expresion.compile(writer, c);
+        this.unaryCompile(writer, c);
+    } else {
+		this.expresion.compile(writer, c);
+		this.secondExpresion.compile(writer, c);
+		this.binaryCompile(writer, c);
+    }
+
+
 }
 
 export default {}
