@@ -171,6 +171,10 @@ class ExprConstNum extends ExprValue {
     get isConstant() {
         return true;
     }
+
+    eval() {
+        return parseFloat(this.value);
+    }
 }
 class ExprConstBool extends ExprValue {
     getType() {
@@ -179,6 +183,10 @@ class ExprConstBool extends ExprValue {
 
     get isConstant() {
         return true;
+    }
+
+    eval() {
+        return JSON.parse(this.value);
     }
 }
 class ExprVecLength extends ExprValue {
@@ -235,31 +243,31 @@ class ExprAdd extends BinaryExpr {
 }
 class ExprSub extends BinaryExpr {
     eval() {
-        return this.expresion.eval() + this.secondExpresion.eval();
+        return this.expresion.eval() - this.secondExpresion.eval();
     }
 }
 class ExprNe extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() != this.secondExpresion.eval();
     }
 }
 class ExprEq extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() == this.secondExpresion.eval();
     }
 }
 class ExprLt extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() <= this.secondExpresion.eval();
     }
 }
 class ExprGe extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() >= this.secondExpresion.eval();
     }
 }
 class ExprLe extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() < this.secondExpresion.eval();
     }
 }
@@ -269,25 +277,21 @@ class ExprMul extends BinaryExpr {
     }
 }
 class ExprOr extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() || this.secondExpresion.eval();
     }
 }
 class ExprAnd extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() && this.secondExpresion.eval();
     }
 }
 class ExprGt extends BinaryExpr {
-	eval() {
+    eval() {
         return this.expresion.eval() > this.secondExpresion.eval();
     }
 }
-class Div extends BinaryExpr {
-	eval() {
-        return this.expresion.eval() / this.secondExpresion.eval();
-    }
-}
+
 class Assign extends BinaryExpr {}
 class StmtVecAssign extends BinaryExpr {
     constructor(id, expr1, expr2, location) {
@@ -359,7 +363,6 @@ window.ExprConstNum = ExprConstNum
 window.ExprAdd = ExprAdd
 window.ExprSub = ExprSub
 window.ExprMul = ExprMul
-window.Div = Div
 window.ExprConstBool = ExprConstBool
 window.Fun = Fun
 window.Assign = Assign
