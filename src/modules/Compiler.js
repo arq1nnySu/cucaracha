@@ -1,10 +1,10 @@
 import AST from './AST';
 
-
 class Writer {
     constructor(arquitecture) {
         this.arquitecture = arquitecture;
         this.sectionMap = { data: "", text: "", codeFuns: "" }
+        this.labelId = 1
         this.registers = [
             { id: "rdi", available: true },
             { id: "rbx", available: true },
@@ -77,6 +77,12 @@ class Writer {
         register.available = false
         return register
     }
+
+    nextLabel() {
+        var label = this.labelId
+        this.labelId += 1
+        return ".label_" + label
+    }
 }
 
 Program.prototype.compile = function(arquitecture) {
@@ -147,7 +153,10 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
     if (this.id == "putChar") {
         writer.writeText(`, ${writer.get('putchar')}`)
         var reg = this.expresions[0].compile(writer, i, varLocal)
-        writer.writeT(`mov rdi, ${reg.id}`)
+        if (reg.id != "rdi") {
+            writer.writeT(`mov rdi, ${reg.id}`)
+        }
+
         writer.writeT(`call ${writer.get('putchar')}`)
         writer.addRegister(reg)
     }
@@ -307,5 +316,39 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
 
     return reg;
 }
+
+var relacionales = function(writer, c, varLocal) {
+    var reg1 = this.expresion.compile(writer, c, varLocal);
+    var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+    writer.writeT(`cmp ${reg1.id}, ${reg2.id}`)
+    var label1 = writer.nextLabel()
+    writer.writeT(this.jumpCode + " " + label1)
+    writer.writeT(`mov ${reg1.id}, 0`)
+    var label2 = writer.nextLabel()
+    writer.writeT("jmp " + label2)
+    writer.writeT(`${label1}:`)
+    writer.writeT(`mov ${reg1.id}, -1`)
+    writer.writeT(`${label2}:`)
+    return reg1;
+}
+
+
+ExprEq.prototype.compile = relacionales
+ExprEq.prototype.jumpCode = 'je'
+
+ExprLt.prototype.compile = relacionales
+ExprLt.prototype.jumpCode = 'jl'
+
+ExprLe.prototype.compile = relacionales
+ExprLe.prototype.jumpCode = 'jle'
+
+ExprGe.prototype.compile = relacionales
+ExprGe.prototype.jumpCode = 'ge'
+
+ExprGt.prototype.compile = relacionales
+ExprGt.prototype.jumpCode = 'gt'
+
+ExprNe.prototype.compile = relacionales
+ExprNe.prototype.jumpCode = 'jne'
 
 export default {}
