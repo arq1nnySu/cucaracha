@@ -186,7 +186,11 @@ class ExprConstBool extends ExprValue {
     }
 
     eval() {
-        return JSON.parse(this.value);
+        return JSON.parse(this.value.toLowerCase());
+    }
+
+    rep() {
+        return this.eval() ? "-1" : "0";
     }
 }
 class ExprVecLength extends ExprValue {

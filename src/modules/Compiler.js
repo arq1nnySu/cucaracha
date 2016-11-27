@@ -208,13 +208,8 @@ ExprConstNum.prototype.compile = function(writer) {
 }
 
 ExprConstBool.prototype.compile = function(writer, i) {
-    var value = "0"
-    if (this.value) {
-        value = "-1"
-    }
-
-    var reg = write.giveRegister();
-    writer.writeT(`mov ${reg.id}, ${value}`)
+    var reg = writer.giveRegister();
+    writer.writeT(`mov ${reg.id}, ${this.rep()}`)
     return reg;
 }
 
