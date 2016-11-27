@@ -38,7 +38,9 @@ class Writer {
     }
 
     writeSection(sectName, line) {
-        this.sectionMap[sectName] = this.sectionMap[sectName] + line
+        if (!this.sectionMap[sectName].includes(line) || sectName == 'codeFuns') {
+            this.sectionMap[sectName] = this.sectionMap[sectName] + line
+        }
     }
 
 
@@ -46,9 +48,7 @@ class Writer {
         this.writeSection("codeFuns", line + "\n")
     }
     writeText(line) {
-        if (!this.sectionMap["text"].includes(line)) {
-            this.writeSection("text", line)
-        }
+        this.writeSection("text", line)
     }
     writeT(line) {
         this.writeSection("codeFuns", line.tab())
@@ -117,6 +117,10 @@ function isNewVar(item) {
     return item.includes("N_");
 }
 
+ASTNode.prototype.bookspace = function(writer, i, varLocal) {
+
+}
+
 Block.prototype.bookspace = function(writer, varLocal) {
     var i = 0
     this.statements.forEach(s => {
@@ -138,23 +142,14 @@ Block.prototype.compile = function(writer, varLocal) {
     writer.writeT("ret")
 }
 
-StmtCall.prototype.bookspace = function(writer, i, varLocal) {
-
-}
 
 StmtCall.prototype.compile = function(writer, i, varLocal) {
     if (this.id == "putChar") {
         writer.writeText(`, ${writer.get('putchar')}`)
-        if (varLocal == {}) {
-            writer.writeT("mov rdi, " + this.expresions[0].value)
-        } else {
-            if (varLocal["N_" + this.expresions[0].value]) {
-                writer.writeT("mov rdi, [rbp - " + varLocal["N_" + this.expresions[0].value] + "]")
-            } else {
-                writer.writeT("mov rdi, [rbp + " + varLocal[this.expresions[0].value] + "]")
-            }
-        }
+        var reg = this.expresions[0].compile(writer, i, varLocal)
+        writer.writeT(`mov rdi, ${reg.id}`)
         writer.writeT(`call ${writer.get('putchar')}`)
+        writer.addRegister(reg)
     }
     if (this.id == "putNum") {
         writer.writeText(`, ${writer.get('printf')}`)
@@ -171,7 +166,7 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
         var spcreq = this.expresions.length * 8
         writer.writeT("sub rsp, " + spcreq)
         this.expresions.forEach(e => {
-            e.compile(writer, c)
+            e.compile(writer, c, varLocal)
             c = c + 8
         })
         writer.writeT("call cuca_" + this.id)
@@ -214,15 +209,15 @@ ExprConstBool.prototype.compile = function(writer, i) {
     return reg;
 }
 
-let aritmeticos = function(writer, c) {
+let aritmeticos = function(writer, c, varLocal) {
     var reg
     if (this.isConstant) {
         reg = writer.giveRegister();
         writer.writeT(`mov ${reg.id}, ${this.eval()}`)
         writer.addRegister(reg);
     } else {
-        reg = this.expresion.compile(writer, c);
-        var reg2 = this.secondExpresion.compile(writer, c);
+        reg = this.expresion.compile(writer, c, varLocal);
+        var reg2 = this.secondExpresion.compile(writer, c, varLocal);
         this.binaryCompile(writer, reg, reg2);
         writer.addRegister(reg2);
     }
@@ -249,24 +244,24 @@ ExprMul.prototype.binaryCompile = function(writer, reg1, reg2) {
     writer.addRegister(rax);
 }
 
-ExprOr.prototype.compile = function(writer, c) {
-    var reg1 = this.expresion.compile(writer, c);
-    var reg2 = this.secondExpresion.compile(writer, c);
+ExprOr.prototype.compile = function(writer, c, varLocal) {
+    var reg1 = this.expresion.compile(writer, c, varLocal);
+    var reg2 = this.secondExpresion.compile(writer, c, varLocal);
     writer.writeT(`or ${reg1.id}, ${reg2.id}`)
     writer.addRegister(reg2);
     return reg1;
 }
 
-ExprAnd.prototype.compile = function(writer, c) {
-    var reg1 = this.expresion.compile(writer, c);
-    var reg2 = this.secondExpresion.compile(writer, c);
+ExprAnd.prototype.compile = function(writer, c, varLocal) {
+    var reg1 = this.expresion.compile(writer, c, varLocal);
+    var reg2 = this.secondExpresion.compile(writer, c, varLocal);
     writer.writeT(`and ${reg1.id}, ${reg2.id}`)
     writer.addRegister(reg2);
     return reg1;
 }
 
-ExprNot.prototype.compile = function(writer, c) {
-    var reg = this.expresion.compile(writer, c);
+ExprNot.prototype.compile = function(writer, c, varLocal) {
+    var reg = this.expresion.compile(writer, c, varLocal);
     writer.writeT(`not ${reg.id}`)
     return reg;
 }
@@ -278,10 +273,39 @@ ExprVar.prototype.compile = function(writer, c, varLocal) {
     } else {
         salt = varLocal[this.value]
     }
-    salt = `[rbp +  ${salt}]`
+    salt = `[rbp -  ${salt}]`
     return { id: salt }
 }
 
+StmtReturn.prototype.compile = function(writer, c, varLocal) {
+    var reg
+    if (this.expresion.isConstant) {
+        reg = { id: this.expresion.eval() }
+    } else {
+        reg = this.expresion.compile(writer, c, varLocal);
+    }
 
+    writer.writeT(`mov rax, ${reg.id}`)
+    writer.addRegister(reg)
+}
+
+ExprCall.prototype.compile = function(writer, c, varLocal) {
+    var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
+    usedRegisters.forEach(reg => writer.writeT(`push ${reg.id}`))
+
+    var spcreq = this.expresions.length * 8
+    writer.writeT("sub rsp, " + spcreq)
+    this.expresions.forEach(e => {
+        e.compile(writer, c, varLocal)
+        c = c + 8
+    })
+    writer.writeT("call cuca_" + this.id)
+
+    usedRegisters.forEach(reg => writer.writeT(`pop ${reg.id}`))
+    var reg = writer.giveRegister()
+    writer.writeT(`mov ${reg.id}, rax`)
+    
+    return reg;
+}
 
 export default {}
