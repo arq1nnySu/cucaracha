@@ -137,6 +137,8 @@ Block.prototype.bookspace = function(writer, varLocal) {
         if (Object.keys(varLocal).filter(isNewVar).length > i) {
             i = i + 1
         }
+        console.log("Que es var local")
+        console.log(varLocal)
     })
     if (i > 0) {
         writer.writeT("sub rsp, " + i * 8)
@@ -145,7 +147,11 @@ Block.prototype.bookspace = function(writer, varLocal) {
 
 Block.prototype.compile = function(writer, varLocal) {
     var i = 1
-    this.statements.forEach(s => s.compile(writer, i, varLocal))
+    this.statements.forEach(s => {s.compile(writer, i, varLocal)
+    	console.log("Que es Stmt")
+    	console.log(s.constructor.name)
+        console.log("Que es var local")
+        console.log(varLocal)})
 }
 
 
@@ -185,8 +191,13 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
 }
 
 StmtAssign.prototype.bookspace = function(writer, i, varLocal) {
+    console.log("Quien es")
+    console.log(this.id)
     if (!varLocal[this.id]) {
-        varLocal["N_" + this.id] = (i + 1) * 8
+        varLocal["N_" + this.id] = (i + 1) * 8        
+    	console.log("valor de "+this.id)
+    	console.log((i+1)*8)
+
     }
 }
 
@@ -197,11 +208,18 @@ StmtAssign.prototype.compile = function(writer, i, varLocal) {
     } else {
         salt = `[rsp + ${varLocal[this.id]}]`
     }
+    console.log("Veamos que pasa aqui")
+    console.log("Que stament es")
+    console.log(this.id)
+    console.log("Que expresion es")
+    console.log(this.expresion.constructor.name)
     var reg = this.expresion.compile(writer, i, varLocal);
+    console.log("en que registro se guarda reg")
+    console.log(reg)
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
+    	console.log("pasa por aqui")
         writer.writeT(`mov ${salt}, ${reg.id}`)
     }
-
     return { id: salt }
 }
 
@@ -358,7 +376,14 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
     var i = 0
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
+        if (!reg.isRegister) {
+	        var newReg = writer.giveRegister()
+	        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+	        reg = newReg
+	    }
+
         writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
+        writer.addRegister(reg)
         i = i + 8
     })
     writer.writeT("call cuca_" + this.id)
