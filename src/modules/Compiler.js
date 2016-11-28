@@ -116,6 +116,9 @@ Fun.prototype.compile = function(writer) {
     })
     this.block.bookspace(writer, varLocal)
     this.block.compile(writer, varLocal)
+    writer.writeT("mov rsp, rbp")
+    writer.writeT("pop rbp")
+    writer.writeT("ret")
 }
 
 
@@ -143,9 +146,6 @@ Block.prototype.bookspace = function(writer, varLocal) {
 Block.prototype.compile = function(writer, varLocal) {
     var i = 1
     this.statements.forEach(s => s.compile(writer, i, varLocal))
-    writer.writeT("mov rsp, rbp")
-    writer.writeT("pop rbp")
-    writer.writeT("ret")
 }
 
 
@@ -298,15 +298,18 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
 }
 
 StmtIfElse.prototype.compile = function(writer, c, varLocal) {
-    var reg = this.expresion.compile(writer, c, varLocal)
-    writer.writeT(`cmp ${reg.id}, 0`)
-    writer.writeT('je . label_else')
-    this.block.compile(writer, varLocal)
-    writer.writeT('jmp . label_fin')
-    writer.writeT('.label_else')
-    this.elseBlock.compile(writer, varLocal)
-    writer.writeT('.label_fin')
+	 var reg = this.expresion.compile(writer, c, varLocal)
+	 var label = writer.nextLabel()
+	 var fin = writer.nextLabel() 
+	 writer.writeT(`cmp ${reg.id}, 0`)
+	 writer.writeT('je '+label)
+	 this.block.compile(writer, varLocal)
+	 writer.writeT('jmp '+fin)
+	 writer.writeT(label+":")
+	 this.elseBlock.compile(writer, varLocal)
+	 writer.writeT(fin+":")
 }
+
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
