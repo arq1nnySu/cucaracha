@@ -6,23 +6,23 @@ class Writer {
         this.sectionMap = { data: "", text: "", codeFuns: "" }
         this.labelId = 1
         this.registers = [
-            { id: "rdi", available: true },
-            { id: "rbx", available: true },
-            { id: "rcx", available: true },
-            { id: "rdx", available: true },
-            { id: "r8", available: true },
-            { id: "r9", available: true },
-            { id: "r10", available: true },
-            { id: "r11", available: true },
-            { id: "r12", available: true },
-            { id: "r13", available: true },
-            { id: "r14", available: true },
-            { id: "r15", available: true },
+            { id: "rdi", available: true, isRegister: true },
+            { id: "rbx", available: true, isRegister: true },
+            { id: "rcx", available: true, isRegister: true },
+            { id: "rdx", available: true, isRegister: true },
+            { id: "r8", available: true, isRegister: true },
+            { id: "r9", available: true, isRegister: true },
+            { id: "r10", available: true, isRegister: true },
+            { id: "r11", available: true, isRegister: true },
+            { id: "r12", available: true, isRegister: true },
+            { id: "r13", available: true, isRegister: true },
+            { id: "r14", available: true, isRegister: true },
+            { id: "r15", available: true, isRegister: true },
         ];
         this.specialRegisters = [
-            { id: "rax", available: true },
-            { id: "rsi", available: true },
-            { id: "rdx", available: true },
+            { id: "rax", available: true, isRegister: true },
+            { id: "rsi", available: true, isRegister: true },
+            { id: "rdx", available: true, isRegister: true },
         ]
     }
 
@@ -156,7 +156,7 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
         if (reg.id != "rdi") {
             writer.writeT(`mov rdi, ${reg.id}`)
         }
-        
+
         writer.writeT(`call ${writer.get('putchar')}`)
         writer.addRegister(reg)
     }
@@ -176,7 +176,8 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
         var spcreq = this.expresions.length * 8
         writer.writeT("sub rsp, " + spcreq)
         this.expresions.forEach(e => {
-            e.compile(writer, c, varLocal)
+            var r = e.compile(writer, c, varLocal)
+            writer.addRegister(r);
             c = c + 8
         })
         writer.writeT("call cuca_" + this.id)
@@ -192,12 +193,15 @@ StmtAssign.prototype.bookspace = function(writer, i, varLocal) {
 StmtAssign.prototype.compile = function(writer, i, varLocal) {
     var salt;
     if (varLocal["N_" + this.id]) {
-    	salt = `[rbp -  ${varLocal["N_" + this.id]}]`
+        salt = `[rbp - ${varLocal["N_" + this.id]}]`
     } else {
-        salt = `[rbp +  ${varLocal[this.id]}]`
+        salt = `[rbp + ${varLocal[this.id]}]`
     }
     var reg = this.expresion.compile(writer, i, varLocal);
-    writer.writeT(`mov ${salt}, ${reg.id}`)
+    if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
+        writer.writeT(`mov ${salt}, ${reg.id}`)
+    }
+
     return { id: salt }
 }
 
@@ -279,7 +283,7 @@ ExprVar.prototype.compile = function(writer, c, varLocal) {
     if (varLocal["N_" + this.value]) {
         salt = `[rbp - ${varLocal["N_" + this.value]}]`
     } else {
-        salt = `[rbp + ${varLocal[this.value]}]` 
+        salt = `[rbp + ${varLocal[this.value]}]`
     }
     return { id: salt }
 }
@@ -297,30 +301,30 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
 }
 
 StmtIfElse.prototype.compile = function(writer, c, varLocal) {
-	 var reg = this.expresion.compile(writer, c, varLocal)
-	 var label = writer.nextLabel()
-	 var fin = writer.nextLabel() 
-	 writer.writeT(`cmp ${reg.id}, 0`)
-	 writer.writeT('je '+label)
-	 this.block.compile(writer, varLocal)
-	 writer.writeT('jmp '+fin)
-	 writer.writeT(label+":")
-	 this.elseBlock.compile(writer, varLocal)
-	 writer.writeT(fin+":")
+    var reg = this.expresion.compile(writer, c, varLocal)
+    var label = writer.nextLabel()
+    var fin = writer.nextLabel()
+    writer.writeT(`cmp ${reg.id}, 0`)
+    writer.writeT('je ' + label)
+    this.block.compile(writer, varLocal)
+    writer.writeT('jmp ' + fin)
+    writer.writeT(label + ":")
+    this.elseBlock.compile(writer, varLocal)
+    writer.writeT(fin + ":")
 }
 
-var ifwhile = function(writer, c, varLocal){
-	 var reg = this.expresion.compile(writer, c, varLocal)
-	 var label = writer.nextLabel()
-	 var fin = writer.nextLabel() 
-	 writer.writeT(label+":")
-	 writer.writeT(`cmp ${reg.id}, 0`)
-	 writer.writeT('je '+fin)
-	 this.block.compile(writer, varLocal)
-	 if(this.constructor.name == "StmtWhile"){
-	 	writer.writeT('jmp '+label)
-	 }
-	 writer.writeT(fin+":")	
+var ifwhile = function(writer, c, varLocal) {
+    var reg = this.expresion.compile(writer, c, varLocal)
+    var label = writer.nextLabel()
+    var fin = writer.nextLabel()
+    writer.writeT(label + ":")
+    writer.writeT(`cmp ${reg.id}, 0`)
+    writer.writeT('je ' + fin)
+    this.block.compile(writer, varLocal)
+    if (this.constructor.name == "StmtWhile") {
+        writer.writeT('jmp ' + label)
+    }
+    writer.writeT(fin + ":")
 }
 
 StmtIf.prototype.compile = ifwhile
@@ -332,13 +336,13 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
         writer.writeT(`push ${reg.id}`)
         reg.available = true
     })
-    var i=0
+    var i = 0
     var spcreq = this.expresions.length * 8
     writer.writeT("sub rsp, " + spcreq)
     this.expresions.forEach(e => {
-    	var reg = e.compile(writer, c, varLocal)
-		writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
-        i = i+8
+        var reg = e.compile(writer, c, varLocal)
+            // writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
+        i = i + 8
     })
     writer.writeT("call cuca_" + this.id)
 
@@ -355,6 +359,13 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
 var relacionales = function(writer, c, varLocal) {
     var reg1 = this.expresion.compile(writer, c, varLocal);
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+
+    if (!reg1.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg1.id}`)
+        reg1 = newReg
+    }
+
     writer.writeT(`cmp ${reg1.id}, ${reg2.id}`)
     var label1 = writer.nextLabel()
     writer.writeT(this.jumpCode + " " + label1)
@@ -417,8 +428,15 @@ ExprVecDeref.prototype.vecVar = ExprVar.prototype.compile
 ExprVecDeref.prototype.compile = function(writer, c, varLocal) {
     this.value = this.id
     var vec = this.vecVar(writer, c, varLocal)
-    var reg = writer.giveRegister()
+
     var reg = this.expresion.compile(writer, c, varLocal);
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+
     writer.writeT(`mov rax, ${reg.id}`)
     writer.writeT(`inc rax`)
     writer.writeT(`sal rax, 3`)
