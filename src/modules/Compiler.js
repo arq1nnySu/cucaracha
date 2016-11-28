@@ -156,7 +156,7 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
         if (reg.id != "rdi") {
             writer.writeT(`mov rdi, ${reg.id}`)
         }
-
+        
         writer.writeT(`call ${writer.get('putchar')}`)
         writer.addRegister(reg)
     }
@@ -167,6 +167,7 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
         writer.writeT("mov rsi, " + reg.id)
         writer.writeT("mov rdi, lli_format_string")
         writer.addRegister(reg);
+        writer.writeT("mov rax, 0")
         writer.writeT(`call ${writer.get('printf')} `)
     }
 
@@ -191,12 +192,11 @@ StmtAssign.prototype.bookspace = function(writer, i, varLocal) {
 StmtAssign.prototype.compile = function(writer, i, varLocal) {
     var salt;
     if (varLocal["N_" + this.id]) {
-        salt = varLocal["N_" + this.id]
+    	salt = `[rbp -  ${varLocal["N_" + this.id]}]`
     } else {
-        salt = varLocal[this.id]
+        salt = `[rbp +  ${varLocal[this.id]}]`
     }
     var reg = this.expresion.compile(writer, i, varLocal);
-    salt = `[rbp -  ${salt}]`
     writer.writeT(`mov ${salt}, ${reg.id}`)
     return { id: salt }
 }
@@ -277,11 +277,10 @@ ExprNot.prototype.compile = function(writer, c, varLocal) {
 ExprVar.prototype.compile = function(writer, c, varLocal) {
     var salt;
     if (varLocal["N_" + this.value]) {
-        salt = varLocal["N_" + this.value]
+        salt = `[rbp - ${varLocal["N_" + this.value]}]`
     } else {
-        salt = varLocal[this.value]
+        salt = `[rbp + ${varLocal[this.value]}]` 
     }
-    salt = `[rbp -  ${salt}]`
     return { id: salt }
 }
 
@@ -314,12 +313,13 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
     usedRegisters.forEach(reg => writer.writeT(`push ${reg.id}`))
-
+    var i=0
     var spcreq = this.expresions.length * 8
     writer.writeT("sub rsp, " + spcreq)
     this.expresions.forEach(e => {
-        e.compile(writer, c, varLocal)
-        c = c + 8
+    	var reg = e.compile(writer, c, varLocal)
+		writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
+        i = i+8
     })
     writer.writeT("call cuca_" + this.id)
 
