@@ -116,6 +116,9 @@ Fun.prototype.compile = function(writer) {
     })
     this.block.bookspace(writer, varLocal)
     this.block.compile(writer, varLocal)
+    writer.writeT("mov rsp, rbp")
+    writer.writeT("pop rbp")
+    writer.writeT("ret")
 }
 
 
@@ -143,9 +146,6 @@ Block.prototype.bookspace = function(writer, varLocal) {
 Block.prototype.compile = function(writer, varLocal) {
     var i = 1
     this.statements.forEach(s => s.compile(writer, i, varLocal))
-    writer.writeT("mov rsp, rbp")
-    writer.writeT("pop rbp")
-    writer.writeT("ret")
 }
 
 
@@ -307,6 +307,10 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 	 this.elseBlock.compile(writer, varLocal)
 	 writer.writeT('.label_fin')
 }
+
+StmtIf.prototype.compile = function(writer, c, varLocal) {}
+
+var 
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
