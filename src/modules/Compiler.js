@@ -309,6 +309,22 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 	 writer.writeT(fin+":")
 }
 
+var ifwhile = function(writer, c, varLocal){
+	 var reg = this.expresion.compile(writer, c, varLocal)
+	 var label = writer.nextLabel()
+	 var fin = writer.nextLabel() 
+	 writer.writeT(label+":")
+	 writer.writeT(`cmp ${reg.id}, 0`)
+	 writer.writeT('je '+fin)
+	 this.block.compile(writer, varLocal)
+	 if(this.constructor.name == "StmtWhile"){
+	 	writer.writeT('jmp '+label)
+	 }
+	 writer.writeT(fin+":")	
+}
+
+StmtIf.prototype.compile = ifwhile
+StmtWhile.prototype.compile = ifwhile
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
