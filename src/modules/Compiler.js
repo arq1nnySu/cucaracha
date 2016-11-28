@@ -299,13 +299,15 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
 
 StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 	 var reg = this.expresion.compile(writer, c, varLocal)
+	 var label = writer.nextLabel()
+	 var fin = writer.nextLabel() 
 	 writer.writeT(`cmp ${reg.id}, 0`)
-	 writer.writeT('je . label_else')
+	 writer.writeT('je '+label)
 	 this.block.compile(writer, varLocal)
-	 writer.writeT('jmp . label_fin')
-	 writer.writeT('.label_else')
+	 writer.writeT('jmp '+fin)
+	 writer.writeT(label+":")
 	 this.elseBlock.compile(writer, varLocal)
-	 writer.writeT('.label_fin')
+	 writer.writeT(fin+":")
 }
 
 
