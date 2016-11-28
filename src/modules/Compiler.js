@@ -308,9 +308,6 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 	 writer.writeT('.label_fin')
 }
 
-StmtIf.prototype.compile = function(writer, c, varLocal) {}
-
-var 
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
