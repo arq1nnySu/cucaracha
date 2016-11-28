@@ -330,6 +330,25 @@ var ifwhile = function(writer, c, varLocal) {
 StmtIf.prototype.compile = ifwhile
 StmtWhile.prototype.compile = ifwhile
 
+StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
+	this.value = this.id
+    var vec = this.vecVar(writer, c, varLocal)
+    var reg = this.expr1.compile(writer, c, varLocal);
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+    var req2 = this.expr2.compile(writer, c, varLocal);
+    writer.writeT(`mov rax, ${reg.id}`)
+    writer.writeT(`inc rax`)
+    writer.writeT(`sal rax, 3`)
+    writer.writeT(`add rax, ${vec.id}`)
+    writer.writeT(`mov [rax], ${reg2.id}`)
+    return reg;
+}
+
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
     usedRegisters.forEach(reg => {
@@ -337,8 +356,6 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
         reg.available = true
     })
     var i = 0
-    var spcreq = this.expresions.length * 8
-    writer.writeT("sub rsp, " + spcreq)
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
             // writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
@@ -397,6 +414,25 @@ ExprGt.prototype.jumpCode = 'gt'
 ExprNe.prototype.compile = relacionales
 ExprNe.prototype.jumpCode = 'jne'
 
+StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
+	this.value = this.id
+    var vec = this.vecVar(writer, c, varLocal)
+    var reg = this.expr1.compile(writer, c, varLocal);
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+    var req2 = this.expr2.compile(writer, c, varLocal);
+    writer.writeT(`mov rax, ${reg.id}`)
+    writer.writeT(`inc rax`)
+    writer.writeT(`sal rax, 3`)
+    writer.writeT(`add rax, ${vec.id}`)
+    writer.writeT(`mov [rax], ${reg2.id}`)
+    return reg;
+}
+
 ExprVecMake.prototype.compile = function(writer, c, varLocal) {
 
     var space = (this.length + 1) * 8
@@ -444,5 +480,7 @@ ExprVecDeref.prototype.compile = function(writer, c, varLocal) {
     writer.writeT(`mov ${reg.id}, [rax]`)
     return reg;
 }
+
+ExprVec
 
 export default {}
