@@ -298,19 +298,22 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
 }
 
 StmtIfElse.prototype.compile = function(writer, c, varLocal) {
-	 var reg = this.expresion.compile(writer, c, varLocal)
-	 writer.writeT(`cmp ${reg.id}, 0`)
-	 writer.writeT('je . label_else')
-	 this.block.compile(writer, varLocal)
-	 writer.writeT('jmp . label_fin')
-	 writer.writeT('.label_else')
-	 this.elseBlock.compile(writer, varLocal)
-	 writer.writeT('.label_fin')
+    var reg = this.expresion.compile(writer, c, varLocal)
+    writer.writeT(`cmp ${reg.id}, 0`)
+    writer.writeT('je . label_else')
+    this.block.compile(writer, varLocal)
+    writer.writeT('jmp . label_fin')
+    writer.writeT('.label_else')
+    this.elseBlock.compile(writer, varLocal)
+    writer.writeT('.label_fin')
 }
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
-    usedRegisters.forEach(reg => writer.writeT(`push ${reg.id}`))
+    usedRegisters.forEach(reg => {
+        writer.writeT(`push ${reg.id}`)
+        reg.available = true
+    })
 
     var spcreq = this.expresions.length * 8
     writer.writeT("sub rsp, " + spcreq)
@@ -320,7 +323,10 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
     })
     writer.writeT("call cuca_" + this.id)
 
-    usedRegisters.forEach(reg => writer.writeT(`pop ${reg.id}`))
+    usedRegisters.forEach(reg => {
+        writer.writeT(`pop ${reg.id}`)
+        reg.available = false
+    })
     var reg = writer.giveRegister()
     writer.writeT(`mov ${reg.id}, rax`)
 
@@ -360,5 +366,46 @@ ExprGt.prototype.jumpCode = 'gt'
 
 ExprNe.prototype.compile = relacionales
 ExprNe.prototype.jumpCode = 'jne'
+
+ExprVecMake.prototype.compile = function(writer, c, varLocal) {
+
+    var space = (this.length + 1) * 8
+    writer.writeT(`sub rsp, ${space}`)
+    var reg = writer.giveRegister()
+    writer.writeT(`mov ${reg.id}, rsp`)
+    var i = 8
+    writer.writeT(`mov qword [${reg.id}], ${this.length}`)
+    this.expresions.forEach(exp => {
+        var expReg = exp.compile(writer, c, varLocal)
+        writer.writeT(`mov qword [${reg.id} + ${i}], ${expReg.id}`)
+        writer.addRegister(expReg)
+        i += 8
+    })
+
+    return reg;
+}
+
+ExprVecLength.prototype.vecVar = ExprVar.prototype.compile
+ExprVecLength.prototype.compile = function(writer, c, varLocal) {
+    var vec = this.vecVar(writer, c, varLocal)
+    writer.writeT(`mov rax, ${vec.id}`)
+    var reg = writer.giveRegister()
+    writer.writeT(`mov ${reg.id}, [rax]`)
+    return reg
+}
+
+ExprVecDeref.prototype.vecVar = ExprVar.prototype.compile
+ExprVecDeref.prototype.compile = function(writer, c, varLocal) {
+    this.value = this.id
+    var vec = this.vecVar(writer, c, varLocal)
+    var reg = writer.giveRegister()
+    var reg = this.expresion.compile(writer, c, varLocal);
+    writer.writeT(`mov rax, ${reg.id}`)
+    writer.writeT(`inc rax`)
+    writer.writeT(`sal rax, 3`)
+    writer.writeT(`add rax, ${vec.id}`)
+    writer.writeT(`mov ${reg.id}, [rax]`)
+    return reg;
+}
 
 export default {}

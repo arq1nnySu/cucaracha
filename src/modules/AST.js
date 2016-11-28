@@ -325,6 +325,10 @@ class ExprVecMake extends ASTNode {
         super(location)
         this.expresions = expresions
     }
+
+    get length() {
+        return this.expresions.length
+    }
 }
 
 class ASTNodeIdAndExpresion extends ASTNode {
