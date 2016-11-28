@@ -195,7 +195,7 @@ StmtAssign.prototype.compile = function(writer, i, varLocal) {
     if (varLocal["N_" + this.id]) {
         salt = `[rbp - ${varLocal["N_" + this.id]}]`
     } else {
-        salt = `[rbp + ${varLocal[this.id]}]`
+        salt = `[rsp + ${varLocal[this.id]}]`
     }
     var reg = this.expresion.compile(writer, i, varLocal);
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
@@ -283,7 +283,7 @@ ExprVar.prototype.compile = function(writer, c, varLocal) {
     if (varLocal["N_" + this.value]) {
         salt = `[rbp - ${varLocal["N_" + this.value]}]`
     } else {
-        salt = `[rbp + ${varLocal[this.value]}]`
+        salt = `[rsp + ${varLocal[this.value]}]`
     }
     return { id: salt }
 }
@@ -314,10 +314,10 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
 }
 
 var ifwhile = function(writer, c, varLocal) {
-    var reg = this.expresion.compile(writer, c, varLocal)
     var label = writer.nextLabel()
     var fin = writer.nextLabel()
     writer.writeT(label + ":")
+    var reg = this.expresion.compile(writer, c, varLocal)
     writer.writeT(`cmp ${reg.id}, 0`)
     writer.writeT('je ' + fin)
     this.block.compile(writer, varLocal)
@@ -358,7 +358,7 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
     var i = 0
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
-            // writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
+        writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
         i = i + 8
     })
     writer.writeT("call cuca_" + this.id)
