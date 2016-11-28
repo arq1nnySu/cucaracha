@@ -204,7 +204,7 @@ ExprConstBool.prototype.compile = function(writer, i) {
         value = "-1"
     }
 
-    var reg = write.giveRegister();
+    var reg = writer.giveRegister();
     writer.writeT(`mov ${reg.id}, ${value}`)
     return reg;
 }
@@ -287,6 +287,17 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
 
     writer.writeT(`mov rax, ${reg.id}`)
     writer.addRegister(reg)
+}
+
+StmtIfElse.prototype.compile = function(writer, c, varLocal) {
+	 var reg = this.expresion.compile(writer, c, varLocal)
+	 writer.writeT(`cmp ${reg.id}, 0`)
+	 writer.writeT('je . label_else')
+	 this.block.compile(writer, varLocal)
+	 writer.writeT('jmp . label_fin')
+	 writer.writeT('.label_else')
+	 this.elseBlock.compile(writer, varLocal)
+	 writer.writeT('.label_fin')
 }
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
