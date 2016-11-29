@@ -114,7 +114,10 @@ Fun.prototype.compile = function(writer) {
         varLocal[p.id] = spcreq
         spcreq = spcreq + 8
     })
-    this.block.bookspace(writer, varLocal)
+    var space = this.block.bookspace(writer, 0, varLocal)
+    if (space > 0) {
+        writer.writeT("sub rsp, " + space * 8)
+    }
     this.block.compile(writer, varLocal)
     writer.writeT("mov rsp, rbp")
     writer.writeT("pop rbp")
@@ -126,32 +129,49 @@ function isNewVar(item) {
     return item.includes("N_");
 }
 
-ASTNode.prototype.bookspace = function(writer, i, varLocal) {
-
+ASTNode.prototype.bookspace = function(writer, acc, varLocal) {
+    return acc;
 }
 
-Block.prototype.bookspace = function(writer, varLocal) {
-    var i = 0
-    this.statements.forEach(s => {
-        s.bookspace(writer, i, varLocal)
-        if (Object.keys(varLocal).filter(isNewVar).length > i) {
-            i = i + 1
-        }
-        console.log("Que es var local")
-        console.log(varLocal)
-    })
-    if (i > 0) {
-        writer.writeT("sub rsp, " + i * 8)
+Block.prototype.bookspace = function(writer, acc, varLocal) {
+    return this.statements.reduce((total, s) => s.bookspace(writer, total, varLocal), acc)
+
+    // if (Object.keys(varLocal).filter(isNewVar).length > i) {
+    //     i = i + 1
+    // }
+}
+
+
+StmtAssign.prototype.bookspace = function(writer, i, varLocal) {
+    if (!varLocal[this.id] && !varLocal["N_" + this.id]) {
+        varLocal["N_" + this.id] = (i + 1) * 8
+        return i + 1
     }
+    return i
+}
+
+StmtIfElse.prototype.bookspace = function(writer, i, varLocal) {
+    var space = this.block.bookspace(writer, i, varLocal)
+    return this.elseBlock.bookspace(writer, space, varLocal)
+}
+
+StmtExpresionBlock.prototype.bookspace = function(writer, space, varLocal) {
+    return this.block.bookspace(writer, space, varLocal)
+}
+
+ExprVecMake.prototype.bookspace = function(writer, space, varLocal) {
+    return (this.length + 1)+space
 }
 
 Block.prototype.compile = function(writer, varLocal) {
     var i = 1
-    this.statements.forEach(s => {s.compile(writer, i, varLocal)
-    	console.log("Que es Stmt")
-    	console.log(s.constructor.name)
+    this.statements.forEach(s => {
+        s.compile(writer, i, varLocal)
+        console.log("Que es Stmt")
+        console.log(s.constructor.name)
         console.log("Que es var local")
-        console.log(varLocal)})
+        console.log(varLocal)
+    })
 }
 
 
@@ -190,17 +210,6 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
     }
 }
 
-StmtAssign.prototype.bookspace = function(writer, i, varLocal) {
-    console.log("Quien es")
-    console.log(this.id)
-    if (!varLocal[this.id]) {
-        varLocal["N_" + this.id] = (i + 1) * 8        
-    	console.log("valor de "+this.id)
-    	console.log((i+1)*8)
-
-    }
-}
-
 StmtAssign.prototype.compile = function(writer, i, varLocal) {
     var salt;
     if (varLocal["N_" + this.id]) {
@@ -217,7 +226,7 @@ StmtAssign.prototype.compile = function(writer, i, varLocal) {
     console.log("en que registro se guarda reg")
     console.log(reg)
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
-    	console.log("pasa por aqui")
+        console.log("pasa por aqui")
         writer.writeT(`mov ${salt}, ${reg.id}`)
     }
     return { id: salt }
@@ -248,6 +257,13 @@ let aritmeticos = function(writer, c, varLocal) {
     } else {
         reg = this.expresion.compile(writer, c, varLocal);
         var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+
+        if (!reg.isRegister) {
+            var newReg = writer.giveRegister()
+            writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+            reg = newReg
+        }
+
         this.binaryCompile(writer, reg, reg2);
         writer.addRegister(reg2);
     }
@@ -318,6 +334,7 @@ StmtReturn.prototype.compile = function(writer, c, varLocal) {
     writer.addRegister(reg)
 }
 
+
 StmtIfElse.prototype.compile = function(writer, c, varLocal) {
     var reg = this.expresion.compile(writer, c, varLocal)
     var label = writer.nextLabel()
@@ -349,7 +366,7 @@ StmtIf.prototype.compile = ifwhile
 StmtWhile.prototype.compile = ifwhile
 
 StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
-	this.value = this.id
+    this.value = this.id
     var vec = this.vecVar(writer, c, varLocal)
     var reg = this.expr1.compile(writer, c, varLocal);
 
@@ -377,12 +394,12 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
         if (!reg.isRegister) {
-	        var newReg = writer.giveRegister()
-	        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
-	        reg = newReg
-	    }
+            var newReg = writer.giveRegister()
+            writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+            reg = newReg
+        }
 
-        writer.writeT(`mov [rsp + ${i}], ${reg.id}`)        	 	
+        writer.writeT(`mov [rsp + ${i}], ${reg.id}`)
         writer.addRegister(reg)
         i = i + 8
     })
@@ -431,17 +448,17 @@ ExprLe.prototype.compile = relacionales
 ExprLe.prototype.jumpCode = 'jle'
 
 ExprGe.prototype.compile = relacionales
-ExprGe.prototype.jumpCode = 'ge'
+ExprGe.prototype.jumpCode = 'jge'
 
 ExprGt.prototype.compile = relacionales
-ExprGt.prototype.jumpCode = 'gt'
+ExprGt.prototype.jumpCode = 'jg'
 
 ExprNe.prototype.compile = relacionales
 ExprNe.prototype.jumpCode = 'jne'
 
 StmtVecAssign.prototype.vecVar = ExprVar.prototype.compile
 StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
-	this.value = this.id
+    this.value = this.id
     var vec = this.vecVar(writer, c, varLocal)
     var reg = this.expresion.compile(writer, c, varLocal);
 
