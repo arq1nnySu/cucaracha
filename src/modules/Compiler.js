@@ -160,7 +160,7 @@ StmtExpresionBlock.prototype.bookspace = function(writer, space, varLocal) {
 }
 
 ExprVecMake.prototype.bookspace = function(writer, space, varLocal) {
-    return (this.length + 1)+space
+    return (this.length + 1) + space
 }
 
 Block.prototype.compile = function(writer, varLocal) {
@@ -385,11 +385,12 @@ StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
 }
 
 ExprCall.prototype.compile = function(writer, c, varLocal) {
-    var usedRegisters = _.filter(writer.registers + writer.specialRegisters, { available: false });
+    var usedRegisters = _.filter(writer.registers.concat(writer.specialRegisters), { available: false });
     usedRegisters.forEach(reg => {
         writer.writeT(`push ${reg.id}`)
         reg.available = true
     })
+    
     var i = 0
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
@@ -400,9 +401,10 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
         }
 
         writer.writeT(`mov [rsp + ${i}], ${reg.id}`)
-        writer.addRegister(reg)
+            // writer.addRegister(reg)
         i = i + 8
     })
+
     writer.writeT("call cuca_" + this.id)
 
     usedRegisters.forEach(reg => {
