@@ -102,22 +102,22 @@ Program.prototype.compile = function(arquitecture) {
 
 Fun.prototype.compile = function(writer) {
     var varLocal = {}
-    var spcreq = (this.parameters.length + 1) * 8 // +1 es porque se guarda el valor de retorno
-
     if (this.id == "putChar" || this.id == "putNum") return "";
 
     writer.write("cuca_" + this.id + ":")
     writer.writeT("push rbp")
     writer.writeT("mov rbp, rsp")
 
-    this.parameters.forEach(p => {
-        varLocal[p.id] = spcreq
-        spcreq = spcreq + 8
-    })
+    
     var space = this.block.bookspace(writer, 0, varLocal)
     if (space > 0) {
         writer.writeT("sub rsp, " + space * 8)
     }
+    var spcreq = (this.parameters.length + 1 +space) * 8 // +1 es porque se guarda el valor de retorno
+    this.parameters.forEach(p => {
+        varLocal[p.id] = spcreq
+        spcreq = spcreq + 8
+    })
     this.block.compile(writer, varLocal)
     writer.writeT("mov rsp, rbp")
     writer.writeT("pop rbp")
@@ -390,7 +390,7 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
         writer.writeT(`push ${reg.id}`)
         reg.available = true
     })
-    
+
     var i = 0
     this.expresions.forEach(e => {
         var reg = e.compile(writer, c, varLocal)
