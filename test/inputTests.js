@@ -15,6 +15,7 @@ _(global).extend({ stringToken: stringToken })
 
 
 let parser = new Jison.Parser(grammar);
+let arq = process.argv[2] || "macos";
 
 Number.prototype.pad = function(size) {
     var s = this + "";
@@ -36,7 +37,7 @@ files.forEach(n => {
             let ast = parser.parse(sourceCode)
 
             console.log(`compilando el test ${file}`);
-            let asm = ast.compile("macos")
+            let asm = ast.compile(arq)
 
             console.log(`guardando el asembler del test ${file}`);
             fs.writeFile(path.join(__dirname, '..', `dist/${file}.asm`), asm, function(err) {
@@ -45,7 +46,8 @@ files.forEach(n => {
                 }
 
                 console.log(chalk.blue(`ejecutando el test ${file}`));
-                exec(`sh run_asm.sh ${file}`)
+                let scritSufix = arq == "macos" ? "_mac" : "";
+                exec(`sh run_asm${scritSufix}.sh ${file}`)
                 console.log(chalk.green(`El test ${file} termino de ejecutar`));
             });
         });
