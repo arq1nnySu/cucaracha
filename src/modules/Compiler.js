@@ -1,4 +1,5 @@
-import AST from './AST';
+import { ASTType, StmtExpresionBlock, UnaryExpr, ASTNodeIdAndExpresions, ExprValue, BinaryExpr, ExprConstNum, ExprAdd, ExprSub, ExprMul, ExprConstBool, Fun, Assign, Arrays, Parameter, Block, IntType, BoolType, VecType, ExprVecLength, ExprVecDeref, ExprVar, UnitType, StmtAssign, Program, StmtIf, StmtIfElse, StmtCall, ExprLt, ExprNot, ExprEq, ExprAnd, ExprOr, ExprGt, StmtVecAssign, StmtReturn, StmtWhile, ExprLe, ExprGe, ExprNe, ExprVecMake, ExprCall, ASTNodeIdAndExpresion, Location, ASTNode } from './AST';
+import _ from 'underscore';
 
 class Writer {
     constructor(arquitecture) {
@@ -108,12 +109,12 @@ Fun.prototype.compile = function(writer) {
     writer.writeT("push rbp")
     writer.writeT("mov rbp, rsp")
 
-    
+
     var space = this.block.bookspace(writer, 0, varLocal)
     if (space > 0) {
         writer.writeT("sub rsp, " + space * 8)
     }
-    var spcreq = (this.parameters.length + 1 +space) * 8 // +1 es porque se guarda el valor de retorno
+    var spcreq = (this.parameters.length + 1 + space) * 8 // +1 es porque se guarda el valor de retorno
     this.parameters.forEach(p => {
         varLocal[p.id] = spcreq
         spcreq = spcreq + 8
@@ -167,10 +168,6 @@ Block.prototype.compile = function(writer, varLocal) {
     var i = 1
     this.statements.forEach(s => {
         s.compile(writer, i, varLocal)
-        console.log("Que es Stmt")
-        console.log(s.constructor.name)
-        console.log("Que es var local")
-        console.log(varLocal)
     })
 }
 
@@ -178,7 +175,7 @@ Block.prototype.compile = function(writer, varLocal) {
 StmtCall.prototype.compile = function(writer, i, varLocal) {
     if (this.id == "putChar") {
         writer.writeText(`, ${writer.get('putchar')}`)
-        var reg = this.expresions[0].compile(writer, i, varLocal)
+        var reg = this.expresions.first().compile(writer, i, varLocal)
         if (reg.id != "rdi") {
             writer.writeT(`mov rdi, ${reg.id}`)
         }
@@ -189,7 +186,7 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
     if (this.id == "putNum") {
         writer.writeText(`, ${writer.get('printf')}`)
         writer.writeSection("data", "lli_format_string db '%lli'")
-        var reg = this.expresions[0].compile(writer, i, varLocal)
+        var reg = this.expresions.first().compile(writer, i, varLocal)
         writer.writeT("mov rsi, " + reg.id)
         writer.writeT("mov rdi, lli_format_string")
         writer.addRegister(reg);
@@ -217,18 +214,11 @@ StmtAssign.prototype.compile = function(writer, i, varLocal) {
     } else {
         salt = `[rsp + ${varLocal[this.id]}]`
     }
-    console.log("Veamos que pasa aqui")
-    console.log("Que stament es")
-    console.log(this.id)
-    console.log("Que expresion es")
-    console.log(this.expresion.constructor.name)
     var reg = this.expresion.compile(writer, i, varLocal);
-    console.log("en que registro se guarda reg")
-    console.log(reg)
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
-        console.log("pasa por aqui")
         writer.writeT(`mov ${salt}, ${reg.id}`)
     }
+    writer.addRegister(reg)
     return { id: salt }
 }
 
@@ -284,6 +274,13 @@ ExprMul.prototype.compile = aritmeticos
 ExprMul.prototype.binaryCompile = function(writer, reg1, reg2) {
     var rax = writer.getSpecial("rax")
 
+    if (!reg2.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg2.id}`)
+        reg2 = newReg
+        writer.addRegister(reg2)
+    }
+
     writer.writeT(`mov ${rax.id}, ${reg1.id}`)
     writer.writeT(`imul ${reg2.id}`)
     writer.writeT(`mov ${reg1.id}, ${rax.id}`)
@@ -293,6 +290,13 @@ ExprMul.prototype.binaryCompile = function(writer, reg1, reg2) {
 ExprOr.prototype.compile = function(writer, c, varLocal) {
     var reg1 = this.expresion.compile(writer, c, varLocal);
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+
+    if (!reg1.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg1.id}`)
+        reg1 = newReg
+    }
+
     writer.writeT(`or ${reg1.id}, ${reg2.id}`)
     writer.addRegister(reg2);
     return reg1;
@@ -301,6 +305,13 @@ ExprOr.prototype.compile = function(writer, c, varLocal) {
 ExprAnd.prototype.compile = function(writer, c, varLocal) {
     var reg1 = this.expresion.compile(writer, c, varLocal);
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+
+    if (!reg1.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg1.id}`)
+        reg1 = newReg
+    }
+
     writer.writeT(`and ${reg1.id}, ${reg2.id}`)
     writer.addRegister(reg2);
     return reg1;
@@ -308,6 +319,13 @@ ExprAnd.prototype.compile = function(writer, c, varLocal) {
 
 ExprNot.prototype.compile = function(writer, c, varLocal) {
     var reg = this.expresion.compile(writer, c, varLocal);
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+
     writer.writeT(`not ${reg.id}`)
     return reg;
 }
@@ -339,7 +357,15 @@ StmtIfElse.prototype.compile = function(writer, c, varLocal) {
     var reg = this.expresion.compile(writer, c, varLocal)
     var label = writer.nextLabel()
     var fin = writer.nextLabel()
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+
     writer.writeT(`cmp ${reg.id}, 0`)
+    writer.addRegister(reg)
     writer.writeT('je ' + label)
     this.block.compile(writer, varLocal)
     writer.writeT('jmp ' + fin)
@@ -353,7 +379,15 @@ var ifwhile = function(writer, c, varLocal) {
     var fin = writer.nextLabel()
     writer.writeT(label + ":")
     var reg = this.expresion.compile(writer, c, varLocal)
+
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
+
     writer.writeT(`cmp ${reg.id}, 0`)
+    writer.addRegister(reg)
     writer.writeT('je ' + fin)
     this.block.compile(writer, varLocal)
     if (this.constructor.name == "StmtWhile") {
@@ -381,6 +415,7 @@ StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
     writer.writeT(`sal rax, 3`)
     writer.writeT(`add rax, ${vec.id}`)
     writer.writeT(`mov [rax], ${reg2.id}`)
+    writer.addRegister(reg2)
     return reg;
 }
 
@@ -436,6 +471,7 @@ var relacionales = function(writer, c, varLocal) {
     writer.writeT(`${label1}:`)
     writer.writeT(`mov ${reg1.id}, -1`)
     writer.writeT(`${label2}:`)
+    writer.addRegister(reg2)
     return reg1;
 }
 

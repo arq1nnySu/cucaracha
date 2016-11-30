@@ -72,19 +72,46 @@ class UnitType extends ASTType {
 }
 
 
-class Arrays extends Array {
+class Arrays {
     constructor(value) {
-        super()
+        this.list = []
         if (value) this.add(value)
     }
 
     add(param) {
-        this.unshift(param)
+        this.list.unshift(param)
         return this
     }
 
     toString() {
         return this.constructor.name
+    }
+
+    forEach(f) {
+        this.list.forEach(f)
+    }
+    reduce(f, base) {
+        return this.list.reduce(f, base)
+    }
+
+    first() {
+        return this.list[0]
+    }
+
+    last() {
+        return _.last(this.list)
+    }
+
+    get length() {
+        return this.list.length
+    }
+
+    get(i){
+        return this.list[i]
+    }
+
+    map(f) {
+        return this.list.map(f)
     }
 }
 
@@ -360,52 +387,4 @@ class StmtIfElse extends StmtIf {
     }
 }
 
-
-window.ASTType = ASTType
-window.StmtExpresionBlock = StmtExpresionBlock
-window.UnaryExpr = UnaryExpr
-window.ASTNodeIdAndExpresions = ASTNodeIdAndExpresions
-window.ExprValue = ExprValue
-window.BinaryExpr = BinaryExpr
-window.ExprConstNum = ExprConstNum
-window.ExprAdd = ExprAdd
-window.ExprSub = ExprSub
-window.ExprMul = ExprMul
-window.ExprConstBool = ExprConstBool
-window.Fun = Fun
-window.Assign = Assign
-window.Arrays = Arrays
-window.Parameter = Parameter
-window.Block = Block
-window.ExprConstBool = ExprConstBool
-window.IntType = IntType
-window.BoolType = BoolType
-window.VecType = VecType
-window.ExprVecLength = ExprVecLength
-window.ExprVecDeref = ExprVecDeref
-window.ExprVar = ExprVar
-window.UnitType = UnitType
-window.StmtAssign = StmtAssign
-window.Program = Program
-window.StmtIf = StmtIf
-window.StmtIfElse = StmtIfElse
-window.StmtCall = StmtCall
-window.ExprLt = ExprLt
-window.ExprNot = ExprNot
-window.ExprEq = ExprEq
-window.ExprAnd = ExprAnd
-window.ExprOr = ExprOr
-window.ExprGt = ExprGt
-window.StmtVecAssign = StmtVecAssign
-window.StmtReturn = StmtReturn
-window.StmtWhile = StmtWhile
-window.ExprLe = ExprLe
-window.ExprGe = ExprGe
-window.ExprNe = ExprNe
-window.ExprVecMake = ExprVecMake
-window.ExprCall = ExprCall
-window.ASTNodeIdAndExpresion = ASTNodeIdAndExpresion
-window.Location = Location
-window.ASTNode = ASTNode
-
-export default {}
+export default { ASTType, StmtExpresionBlock, UnaryExpr, ASTNodeIdAndExpresions, ExprValue, BinaryExpr, ExprConstNum, ExprAdd, ExprSub, ExprMul, ExprConstBool, Fun, Assign, Arrays, Parameter, Block, ExprConstBool, IntType, BoolType, VecType, ExprVecLength, ExprVecDeref, ExprVar, UnitType, StmtAssign, Program, StmtIf, StmtIfElse, StmtCall, ExprLt, ExprNot, ExprEq, ExprAnd, ExprOr, ExprGt, StmtVecAssign, StmtReturn, StmtWhile, ExprLe, ExprGe, ExprNe, ExprVecMake, ExprCall, ASTNodeIdAndExpresion, Location, ASTNode }
