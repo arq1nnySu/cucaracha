@@ -114,7 +114,8 @@ Fun.prototype.compile = function(writer) {
     if (space > 0) {
         writer.writeT("sub rsp, " + space * 8)
     }
-    var spcreq = (this.parameters.length + 1 + space) * 8 // +1 es porque se guarda el valor de retorno
+    var parametersSpace = this.parameters.reduce((total, p) => total + p.parameterSpace(), 1)
+    var spcreq = (parametersSpace + 1 + space) * 8 // +1 es porque se guarda el valor de retorno
     this.parameters.forEach(p => {
         varLocal[p.id] = spcreq
         spcreq = spcreq + 8
@@ -195,24 +196,24 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
     }
 
     if (this.id != "putNum" && this.id != "putChar") {
-        var c = 0
         var spcreq = this.expresions.length * 8
         writer.writeT("sub rsp, " + spcreq)
-        this.expresions.forEach(e => {
-            var r = e.compile(writer, c, varLocal)
-            writer.addRegister(r);
-            c = c + 8
-        })
+        var usedRegisters = this.pushArgumentBeforeCall(writer, i, varLocal)
         writer.writeT("call cuca_" + this.id)
+        writer.writeT("add rsp, " + spcreq)
+        usedRegisters.forEach(reg => {
+            writer.writeT(`pop ${reg.id}`)
+            reg.available = false
+        })
     }
 }
 
 StmtAssign.prototype.compile = function(writer, i, varLocal) {
     var salt;
-    if (varLocal["N_" + this.id]) {
-        salt = `[rbp - ${varLocal["N_" + this.id]}]`
-    } else {
+    if (varLocal[this.id]) {
         salt = `[rsp + ${varLocal[this.id]}]`
+    } else {
+        salt = `[rbp - ${varLocal["N_" + this.id]}]`
     }
     var reg = this.expresion.compile(writer, i, varLocal);
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
@@ -330,12 +331,17 @@ ExprNot.prototype.compile = function(writer, c, varLocal) {
     return reg;
 }
 
+ASTNode.prototype.parameterSpace = () => 0
+ExprVar.prototype.parameterSpace = function() {
+    return this.validate().isVec() ? 1 : 0
+}
+
 ExprVar.prototype.compile = function(writer, c, varLocal) {
     var salt;
-    if (varLocal["N_" + this.value]) {
-        salt = `[rbp - ${varLocal["N_" + this.value]}]`
-    } else {
+    if (varLocal[this.value]) {
         salt = `[rsp + ${varLocal[this.value]}]`
+    } else {
+        salt = `[rbp - ${varLocal["N_" + this.value]}]`
     }
     return { id: salt }
 }
@@ -419,7 +425,7 @@ StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
     return reg;
 }
 
-ExprCall.prototype.compile = function(writer, c, varLocal) {
+var pushArgumentBeforeCall = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers.concat(writer.specialRegisters), { available: false });
     usedRegisters.forEach(reg => {
         writer.writeT(`push ${reg.id}`)
@@ -440,6 +446,13 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
         i = i + 8
     })
 
+    return usedRegisters
+
+}
+ExprCall.prototype.pushArgumentBeforeCall = pushArgumentBeforeCall
+StmtCall.prototype.pushArgumentBeforeCall = pushArgumentBeforeCall
+ExprCall.prototype.compile = function(writer, c, varLocal) {
+    var usedRegisters = this.pushArgumentBeforeCall(writer, c, varLocal)
     writer.writeT("call cuca_" + this.id)
 
     usedRegisters.forEach(reg => {

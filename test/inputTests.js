@@ -15,7 +15,7 @@ _(global).extend({ stringToken: stringToken })
 
 
 let parser = new Jison.Parser(grammar);
-let arq = process.argv[2] || "macos";
+let arq = process.argv[2] || "linux";
 
 Number.prototype.pad = function(size) {
     var s = this + "";
@@ -37,6 +37,7 @@ files.forEach(n => {
             let ast = parser.parse(sourceCode)
 
             console.log(`compilando el test ${file}`);
+            ast.semanticize();
             let asm = ast.compile(arq)
 
             console.log(`guardando el asembler del test ${file}`);

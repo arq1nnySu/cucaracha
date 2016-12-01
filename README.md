@@ -22,6 +22,14 @@
 	sh run.sh
 ```
 
+## Para correr todos los inputs 
+
+    
+```bash
+	# arq puede ser linux o macos (por default es linux)
+	npm test arq
+```
+
 ##Enunciado
 [Enuunciado.pdf](resources/Enunciado.pdf)
 

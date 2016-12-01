@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 class Location {
     constructor(first_line, last_line, first_column, last_column) {
         this.first_line = first_line
@@ -106,7 +108,7 @@ class Arrays {
         return this.list.length
     }
 
-    get(i){
+    get(i) {
         return this.list[i]
     }
 
