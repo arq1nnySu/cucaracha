@@ -115,7 +115,7 @@ Fun.prototype.compile = function(writer) {
         writer.writeT("sub rsp, " + space * 8)
     }
     var parametersSpace = this.parameters.reduce((total, p) => total + p.parameterSpace(), 1)
-    var spcreq = (parametersSpace + 1 + space) * 8 // +1 es porque se guarda el valor de retorno
+    var spcreq = (parametersSpace + 1) * 8 // +1 es porque se guarda el valor de retorno
     this.parameters.forEach(p => {
         varLocal[p.id] = spcreq
         spcreq = spcreq + 8
@@ -127,9 +127,6 @@ Fun.prototype.compile = function(writer) {
 }
 
 
-function isNewVar(item) {
-    return item.includes("N_");
-}
 
 ASTNode.prototype.bookspace = function(writer, acc, varLocal) {
     return acc;
@@ -137,10 +134,6 @@ ASTNode.prototype.bookspace = function(writer, acc, varLocal) {
 
 Block.prototype.bookspace = function(writer, acc, varLocal) {
     return this.statements.reduce((total, s) => s.bookspace(writer, total, varLocal), acc)
-
-    // if (Object.keys(varLocal).filter(isNewVar).length > i) {
-    //     i = i + 1
-    // }
 }
 
 
@@ -196,26 +189,23 @@ StmtCall.prototype.compile = function(writer, i, varLocal) {
     }
 
     if (this.id != "putNum" && this.id != "putChar") {
-        var spcreq = this.expresions.length * 8
-        writer.writeT("sub rsp, " + spcreq)
-        var usedRegisters = this.pushArgumentBeforeCall(writer, i, varLocal)
-        writer.writeT("call cuca_" + this.id)
-        writer.writeT("add rsp, " + spcreq)
-        usedRegisters.forEach(reg => {
-            writer.writeT(`pop ${reg.id}`)
-            reg.available = false
-        })
+        this.compileCall(writer, i, varLocal)
     }
 }
 
 StmtAssign.prototype.compile = function(writer, i, varLocal) {
     var salt;
     if (varLocal[this.id]) {
-        salt = `[rsp + ${varLocal[this.id]}]`
+        salt = `[rbp + ${varLocal[this.id]}]`
     } else {
         salt = `[rbp - ${varLocal["N_" + this.id]}]`
     }
     var reg = this.expresion.compile(writer, i, varLocal);
+    if (!reg.isRegister) {
+        var newReg = writer.giveRegister()
+        writer.writeT(`mov ${newReg.id}, ${reg.id}`)
+        reg = newReg
+    }
     if (salt.replace(/\s/g, "") != reg.id.replace(/\s/g, "")) {
         writer.writeT(`mov ${salt}, ${reg.id}`)
     }
@@ -336,12 +326,20 @@ ExprVar.prototype.parameterSpace = function() {
     return this.validate().isVec() ? 1 : 0
 }
 
+function isNewVar(item) {
+    return item.includes("N_");
+}
+
 ExprVar.prototype.compile = function(writer, c, varLocal) {
     var salt;
+
+ 
     if (varLocal[this.value]) {
-        salt = `[rsp + ${varLocal[this.value]}]`
+        salt = `[rbp + ${varLocal[this.value]}]`
     } else {
-        salt = `[rbp - ${varLocal["N_" + this.value]}]`
+    	if (varLocal["N_" + this.value]) {
+    		salt = `[rbp - ${varLocal["N_" + this.value]}]`
+       }
     }
     return { id: salt }
 }
@@ -425,40 +423,45 @@ StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
     return reg;
 }
 
-var pushArgumentBeforeCall = function(writer, c, varLocal) {
+var compileCall = function(writer, c, varLocal) {
     var usedRegisters = _.filter(writer.registers.concat(writer.specialRegisters), { available: false });
     usedRegisters.forEach(reg => {
         writer.writeT(`push ${reg.id}`)
         reg.available = true
     })
 
-    var i = 0
-    this.expresions.forEach(e => {
-        var reg = e.compile(writer, c, varLocal)
-        if (!reg.isRegister) {
+    var regs = this.expresions.map(e => {
+		var reg = e.compile(writer, c, varLocal)
+		if (!reg.isRegister) {
             var newReg = writer.giveRegister()
             writer.writeT(`mov ${newReg.id}, ${reg.id}`)
             reg = newReg
         }
-
+        return reg
+    })
+    var i = 0
+    
+    var spcreq = this.expresions.length * 8
+    writer.writeT("sub rsp, " + spcreq)
+    
+    regs.forEach(reg =>{
         writer.writeT(`mov [rsp + ${i}], ${reg.id}`)
             // writer.addRegister(reg)
         i = i + 8
     })
 
-    return usedRegisters
-
-}
-ExprCall.prototype.pushArgumentBeforeCall = pushArgumentBeforeCall
-StmtCall.prototype.pushArgumentBeforeCall = pushArgumentBeforeCall
-ExprCall.prototype.compile = function(writer, c, varLocal) {
-    var usedRegisters = this.pushArgumentBeforeCall(writer, c, varLocal)
     writer.writeT("call cuca_" + this.id)
+    writer.writeT("add rsp, " + spcreq)
 
     usedRegisters.forEach(reg => {
         writer.writeT(`pop ${reg.id}`)
         reg.available = false
     })
+}
+ExprCall.prototype.compileCall = compileCall
+StmtCall.prototype.compileCall = compileCall
+ExprCall.prototype.compile = function(writer, c, varLocal) {
+    var usedRegisters = this.compileCall(writer, c, varLocal)
     var reg = writer.giveRegister()
     writer.writeT(`mov ${reg.id}, rax`)
 

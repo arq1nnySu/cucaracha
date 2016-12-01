@@ -45,6 +45,7 @@
         "gulp-uglify": "^2.0.0",
         "gulp-useref": "^3.1.2",
         "jison": "^0.4.17",
-        "run-sequence": "^1.2.2"
+        "run-sequence": "^1.2.2",
+        "underscore" : "1.8.3"
     }
 }
