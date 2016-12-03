@@ -453,7 +453,7 @@ var compileCall = function(writer, c, varLocal) {
     writer.writeT("call cuca_" + this.id)
     writer.writeT("add rsp, " + spcreq)
 
-    usedRegisters.forEach(reg => {
+    usedRegisters.reverse().forEach(reg => {
         writer.writeT(`pop ${reg.id}`)
         reg.available = false
     })
