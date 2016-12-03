@@ -268,9 +268,10 @@ let aritmeticos = function(writer, c, varLocal) {
         reg.moveTo(this.eval())
         reg.free();
     } else {
-        reg = this.expresion.compile(writer, c, varLocal).toRegister();
+        reg = this.expresion.compile(writer, c, varLocal);
         var reg2 = this.secondExpresion.compile(writer, c, varLocal);
 
+        reg = reg.toRegister()
         this.binaryCompile(writer, reg, reg2);
         reg2.free();
     }
@@ -297,9 +298,10 @@ ExprMul.prototype.binaryCompile = function(writer, reg1, reg2) {
 }
 
 ExprOr.prototype.compile = function(writer, c, varLocal) {
-    var reg1 = this.expresion.compile(writer, c, varLocal).toRegister();
+    var reg1 = this.expresion.compile(writer, c, varLocal)
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
 
+    reg1 = reg1.toRegister();
     writer.writeT(`or ${reg1.id}, ${reg2.id}`)
     reg2.free();
     return reg1;
@@ -309,6 +311,7 @@ ExprAnd.prototype.compile = function(writer, c, varLocal) {
     var reg1 = this.expresion.compile(writer, c, varLocal).toRegister();
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
 
+    reg1 = reg1.toRegister();
     writer.writeT(`and ${reg1.id}, ${reg2.id}`)
     reg2.free();
     return reg1;
@@ -340,7 +343,7 @@ ExprVar.prototype.compile = function(writer, c, varLocal) {
             salt = `[rbp - ${varLocal["N_" + this.value]}]`
         }
     }
-    return new Direction(salt, false, false, writer)
+    return new Direction(salt, true, false, writer)
 }
 
 StmtReturn.prototype.compile = function(writer, c, varLocal) {
@@ -393,8 +396,9 @@ StmtWhile.prototype.compile = ifwhile
 StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
     this.value = this.id
     var vec = this.vecVar(writer, c, varLocal)
-    var reg = this.expr1.compile(writer, c, varLocal).toRegister()
+    var reg = this.expr1.compile(writer, c, varLocal)
     var req2 = this.expr2.compile(writer, c, varLocal);
+    reg1 = reg1.toRegister();
 
     writer.writeT(`mov rax, ${reg.id}`)
     writer.writeT(`inc rax`)
@@ -442,8 +446,9 @@ ExprCall.prototype.compile = function(writer, c, varLocal) {
 }
 
 var relacionales = function(writer, c, varLocal) {
-    var reg1 = this.expresion.compile(writer, c, varLocal).toRegister();
+    var reg1 = this.expresion.compile(writer, c, varLocal)
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+    reg1 = reg1.toRegister();
 
     writer.writeT(`cmp ${reg1.id}, ${reg2.id}`)
     var label1 = writer.nextLabel()
@@ -481,8 +486,9 @@ StmtVecAssign.prototype.vecVar = ExprVar.prototype.compile
 StmtVecAssign.prototype.compile = function(writer, c, varLocal) {
     this.value = this.id
     var vec = this.vecVar(writer, c, varLocal)
-    var reg = this.expresion.compile(writer, c, varLocal).toRegister();
+    var reg = this.expresion.compile(writer, c, varLocal)
     var reg2 = this.secondExpresion.compile(writer, c, varLocal);
+    reg = reg.toRegister();
 
     writer.writeT(`mov rax, ${reg.id}`)
     writer.writeT(`inc rax`)
