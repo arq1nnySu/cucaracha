@@ -292,7 +292,9 @@ ExprMul.prototype.compile = aritmeticos
 ExprMul.prototype.binaryCompile = function(writer, reg1, reg2) {
     var rax = writer.getSpecial("rax")
     rax.move(reg1)
-    writer.writeT(`imul ${reg2.toRegister().id}`)
+    var reg = reg2.toRegister() 
+    writer.writeT(`imul ${reg.id}`)
+    reg.free()
     reg1.move(rax)
     rax.free();
 }
@@ -335,7 +337,6 @@ function isNewVar(item) {
 ExprVar.prototype.compile = function(writer, c, varLocal) {
     var salt;
 
-
     if (varLocal[this.value]) {
         salt = `[rbp + ${varLocal[this.value]}]`
     } else {
@@ -349,7 +350,7 @@ ExprVar.prototype.compile = function(writer, c, varLocal) {
 StmtReturn.prototype.compile = function(writer, c, varLocal) {
     var reg
     if (this.expresion.isConstant) {
-        reg = { id: this.expresion.eval() }
+        reg = new Direction(this.expresion.eval(), false, false, writer)
     } else {
         reg = this.expresion.compile(writer, c, varLocal);
     }
