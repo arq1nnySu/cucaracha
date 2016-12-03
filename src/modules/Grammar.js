@@ -39,7 +39,7 @@ export const grammar = {
     "lex": {
         "rules": [
             ["\\s+", "/* skip whitespace */"],
-            ["//[/ a-zA-Z0-9,:_()/><!=]*+.", "/* skip comment */"],
+            ["//[/ a-zA-Z0-9,:_()/><!=+.]*", "/* skip comment */"],
             ["$", "return 'EOF'"],
             ["[0-9]+", "return 'NUM'"],
             ["\\(", "return 'LPAREN'"],
